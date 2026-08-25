@@ -1,0 +1,7 @@
+# 截图/临时渲染产物
+shots/
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db
