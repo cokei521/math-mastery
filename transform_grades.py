@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import re
+import os, re
 
-P = "F:/workbuddy/math-mastery/js/data.js"
+# 路径相对化：无论从哪个目录运行都指向本脚本同级的 js/data.js
+HERE = os.path.dirname(os.path.abspath(__file__))
+P = os.path.join(HERE, "js", "data.js")
 src = open(P, encoding="utf-8").read()
 
 CN = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"]
@@ -72,6 +74,9 @@ def repl(line):
         return line
     tid = mid.group(1)
     if tid not in MAP:
+        return line
+    # 幂等：已含 stage 则不重复写入（避免 grade:"X",stage:"Y",stage:"Y"）
+    if "stage:" in line:
         return line
     stage, grade = MAP[tid]
     # 替换 grade 值，并在其后插入 stage（保持同行，后续还有 name 等属性）

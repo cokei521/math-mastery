@@ -10,6 +10,7 @@
   function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
   let state = load(); // { [id]: { mastered:bool, weak:{ [qidx]:{fails,clear} } } }
+  let pendingScrollTech = null; // 返回路径时，定位并高亮到此技巧节点
 
   /* ---- 解锁规则（按年级动态计算，单一事实来源）----
    * 小学 1–6 年级、初中初一/初二（7、8 年级）：
@@ -65,6 +66,16 @@
     try { return `<div class="qfig">${window.Fig[name](params)}</div>`; }
     catch (e) { return ""; }
   }
+  // 渲染单题自带配图（生成题也可用 q.fig 指定图元名或 {name,参数}）
+  function renderFigOf(q) {
+    if (!q || !q.fig || !window.Fig) return "";
+    let name, params = {};
+    if (typeof q.fig === "string") name = q.fig;
+    else { name = q.fig.name; params = q.fig; }
+    if (!window.Fig[name]) return "";
+    try { return `<div class="qfig">${window.Fig[name](params)}</div>`; }
+    catch (e) { return ""; }
+  }
 
   /* ---------------- 路由 ---------------- */
   function route() {
@@ -81,6 +92,13 @@
     renderPath();
   }
   window.addEventListener("hashchange", route);
+
+  // 返回学习路径，并定位/高亮到指定技巧节点（避免回到页面最顶部）
+  function goPath(techId) {
+    pendingScrollTech = techId || null;
+    if (location.hash.replace(/^#\/?/, "") === "path") renderPath();
+    else location.hash = "#/path";
+  }
 
   /* ---------------- 学习路径 ---------------- */
   function renderPath() {
@@ -135,10 +153,17 @@
               </div>
               ${status === "lock" ? `<div class="meta" style="color:var(--lock)">需先掌握：${esc(tech(t.prereq).name)}</div>` : ""}
             </div>`;
+          node.id = "node-" + t.id;
           v.appendChild(node);
         });
       });
     });
+    // 若从某技巧返回路径，自动定位并高亮该节点
+    if (pendingScrollTech) {
+      const el = document.getElementById("node-" + pendingScrollTech);
+      if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1800); }
+      pendingScrollTech = null;
+    }
   }
 
   /* ---------------- 学习页 ---------------- */
@@ -167,10 +192,11 @@
     const acts = document.createElement("div"); acts.className = "row";
     acts.style.margin = "4px 0 18px";
     acts.innerHTML = `
-      <a class="btn" href="#/practice/${t.id}">开始练习（${t.questions.length} 题）</a>
+      <a class="btn" href="#/practice/${t.id}">开始练习（${typeof t.qgen === "function" ? "每轮 8 题·随机" : t.questions.length + " 题"}）</a>
       ${!st.mastered ? `<a class="btn soft" href="#/gate/${t.id}">通关测试</a>` : `<span class="status-pill done">已掌握 ✓</span>`}
-      <a class="btn ghost" href="#/path">返回路径</a>`;
+      <a class="btn ghost" id="backBtnL" href="#/path">返回路径</a>`;
     v.appendChild(acts);
+    acts.querySelector("#backBtnL").addEventListener("click", (e) => { e.preventDefault(); goPath(t.id); });
   }
 
   /* ---------------- 练习 / 通关 ---------------- */
@@ -180,21 +206,47 @@
     return { opts: sh.map(i => q.opts[i]), ans: sh.indexOf(q.ans) };
   }
 
+  // 判断题识别：仅 2 个选项且语义为「对/错」
+  function isJudge(q) {
+    if (!q.opts || q.opts.length !== 2) return false;
+    const s = q.opts.map(x => String(x).trim());
+    const yes = s.some(x => x === "对" || x === "正确" || x === "✓" || x === "✔");
+    const no = s.some(x => x === "错" || x === "错误" || x === "✗" || x === "✘");
+    return yes && no;
+  }
+  // 判断题标记：✓ 对 / ✗ 错
+  function judgeMark(text) {
+    const t = String(text).trim();
+    return (t === "对" || t === "正确" || t === "✓" || t === "✔") ? "✓" : "✗";
+  }
+
   function renderQuiz(id, mode) {
     const v = view(); v.innerHTML = "";
     const t = tech(id); if (!t) return renderPath();
     if (!unlocked(id)) { toast("先融会贯通上一技巧才能解锁"); location.hash = "#/path"; return; }
     const st = tstate(id);
 
-    let pool;
-    if (mode === "gate") {
-      const weakIdx = Object.keys(st.weak).filter(k => !st.weak[k].cleared).map(Number);
-      const rest = shuffle(t.questions.map((_, i) => i)).filter(i => !weakIdx.includes(i));
-      pool = weakIdx.concat(rest).slice(0, Math.max(5, weakIdx.length));
+    const genMode = typeof t.qgen === "function";
+    let items; // {q, qidx, gen}
+    if (genMode) {
+      // 参数化出题：每次生成全新随机题，真正不重样（第一遍/第二遍/第三遍都不同）
+      items = t.qgen(8).map((q, idx) => ({ q, qidx: idx, gen: true }));
     } else {
-      pool = shuffle(t.questions.map((_, i) => i));
+      let pool;
+      if (mode === "gate") {
+        const weakIdx = Object.keys(st.weak).filter(k => !st.weak[k].cleared).map(Number);
+        const rest = shuffle(t.questions.map((_, i) => i)).filter(i => !weakIdx.includes(i));
+        pool = weakIdx.concat(rest).slice(0, Math.max(5, weakIdx.length));
+      } else {
+        // 自由练习：每次随机抽题（随机子集 + 随机顺序），避免每次都是同一批固定题
+        // 题少（≤6 道）时全部出示；题多时抽约 70%，且至少出 5 道，保证「每轮不少于 5 题」
+        const n = t.questions.length;
+        const k = n <= 6 ? n : Math.max(5, Math.ceil(n * 0.7));
+        pool = shuffle(t.questions.map((_, i) => i)).slice(0, k);
+      }
+      items = pool.map(i => ({ q: t.questions[i], qidx: i, gen: false }));
     }
-    const total = pool.length;
+    const total = items.length;
     let answered = 0, correct = 0;
 
     const head = document.createElement("div"); head.className = "card";
@@ -226,21 +278,23 @@
         }
       } else {
         banner.innerHTML = `<div class="qres">本轮完成 ${total} 题，正确 ${correct} 题。</div>
-          <a class="btn ghost" href="#/path">返回路径</a>`;
+          <a class="btn ghost" id="backBtn2" href="#/path">返回路径</a>`;
+        banner.querySelector("#backBtn2").addEventListener("click", (e) => { e.preventDefault(); goPath(t.id); });
       }
       list.appendChild(banner);
       updateBadge();
     }
 
-    pool.forEach((qidx, qi) => {
-      const q = t.questions[qidx];
-      const disp = shuffleOptions(q);
+    items.forEach((it, qi) => {
+      const q = it.q;
+      const judge = isJudge(q);
+      const disp = judge ? { opts: q.opts, ans: q.ans } : shuffleOptions(q);
       const card = document.createElement("div"); card.className = "q"; card.dataset.done = "0";
       const tag = q.level === "易错" ? '<span class="tag w">易错</span>' : (q.level === "进阶" ? '<span class="tag g">进阶</span>' : '<span class="tag">基础</span>');
-      const fig = qfigSVG(t, qidx);
+      const fig = renderFigOf(q);
       card.innerHTML = `<div class="qtext">${qi + 1}. ${esc(q.q)} ${tag}</div>
         ${fig}
-        <div class="opts">${disp.opts.map((o, i) => `<div class="opt" data-i="${i}"><span class="mark">${String.fromCharCode(65 + i)}</span><span>${esc(o)}</span></div>`).join("")}</div>`;
+        <div class="opts${judge ? " judge" : ""}">${disp.opts.map((o, i) => `<div class="opt${judge ? " judge" : ""}" data-i="${i}"><span class="mark${judge ? " judge" : ""}">${judge ? judgeMark(o) : String.fromCharCode(65 + i)}</span><span>${esc(o)}</span></div>`).join("")}</div>`;
       list.appendChild(card);
 
       const opts = card.querySelectorAll(".opt");
@@ -255,10 +309,11 @@
 
         if (chosen === ans) {
           correct++;
-          if (st.weak["" + qidx]) st.weak["" + qidx].cleared = true;
+          if (it.gen) { st.weak[t.id] = { fails: 0, cleared: true }; }
+          else if (st.weak["" + it.qidx]) st.weak["" + it.qidx].cleared = true;
         } else {
-          if (!st.weak["" + qidx]) st.weak["" + qidx] = { fails: 0, cleared: false };
-          st.weak["" + qidx].fails++; st.weak["" + qidx].cleared = false;
+          if (it.gen) { st.weak[t.id] = st.weak[t.id] || { fails: 0, cleared: false }; st.weak[t.id].fails++; st.weak[t.id].cleared = false; }
+          else { if (!st.weak["" + it.qidx]) st.weak["" + it.qidx] = { fails: 0, cleared: false }; st.weak["" + it.qidx].fails++; st.weak["" + it.qidx].cleared = false; }
         }
         save(state); updateBadge();
         answered++;
@@ -268,8 +323,18 @@
 
     if (mode === "practice") {
       const again = document.createElement("div"); again.className = "row"; again.style.margin = "6px 0 16px";
-      again.innerHTML = `<a class="btn ghost" href="#/practice/${t.id}">🔄 再练一组</a><a class="btn soft" href="#/path">返回路径</a>`;
+      again.innerHTML = `<a class="btn ghost" id="againBtn" href="#/practice/${t.id}">🔄 再练一组</a><a class="btn soft" id="backBtn" href="#/path">返回路径</a>`;
       v.appendChild(again);
+      // 关键修复：当前页 hash 与按钮 href 相同，hashchange 不会触发，需手动强制重渲染
+      again.querySelector("#againBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        renderQuiz(t.id, "practice"); // 重新进入会重新随机抽题 / 重新生成，做到「再练一组」立即出新题
+      });
+      // 返回路径时，定位到当前练习的技巧节点，而不是回到页面顶部
+      again.querySelector("#backBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        goPath(t.id);
+      });
     }
   }
 
@@ -280,8 +345,15 @@
     const items = [];
     TECHNIQUES.forEach(t => {
       const st = tstate(t.id);
+      const gen = typeof t.qgen === "function";
       Object.keys(st.weak).forEach(k => {
-        if (!st.weak[k].cleared) items.push({ t, qidx: +k });
+        if (st.weak[k].cleared) return;
+        if (gen) {
+          // 参数化方法：薄弱点指向“整个方法”，复习时重新生成一道随机题来攻克
+          items.push({ t, q: t.qgen(1)[0], gen: true, key: t.id });
+        } else {
+          items.push({ t, q: t.questions[+k], gen: false, key: "" + k });
+        }
       });
     });
     if (!items.length) {
@@ -295,13 +367,14 @@
     let done = 0, ok = 0;
     const list = document.createElement("div"); v.appendChild(list);
     items.forEach((it, i) => {
-      const q = it.t.questions[it.qidx];
-      const disp = shuffleOptions(q);
+      const q = it.q;
+      const judge = isJudge(q);
+      const disp = judge ? { opts: q.opts, ans: q.ans } : shuffleOptions(q);
       const card = document.createElement("div"); card.className = "q"; card.dataset.done = "0";
-      const fig = qfigSVG(it.t, it.qidx);
+      const fig = renderFigOf(q);
       card.innerHTML = `<div class="qtext">${esc(it.t.name)} ｜ ${i + 1}. ${esc(q.q)}</div>
         ${fig}
-        <div class="opts">${disp.opts.map((o, j) => `<div class="opt" data-i="${j}"><span class="mark">${String.fromCharCode(65 + j)}</span><span>${esc(o)}</span></div>`).join("")}</div>`;
+        <div class="opts${judge ? " judge" : ""}">${disp.opts.map((o, j) => `<div class="opt${judge ? " judge" : ""}" data-i="${j}"><span class="mark${judge ? " judge" : ""}">${judge ? judgeMark(o) : String.fromCharCode(65 + j)}</span><span>${esc(o)}</span></div>`).join("")}</div>`;
       list.appendChild(card);
       const opts = card.querySelectorAll(".opt");
       opts.forEach(op => op.addEventListener("click", () => {
@@ -312,8 +385,8 @@
         if (chosen === ans) op.classList.add("correct"); else op.classList.add("wrong");
         const ex = document.createElement("div"); ex.className = "explain"; ex.innerHTML = "解析：" + esc(q.explain); card.appendChild(ex);
         const st = tstate(it.t.id);
-        if (chosen === q.ans) { st.weak["" + it.qidx].cleared = true; ok++; }
-        else { st.weak["" + it.qidx].cleared = false; }
+        if (chosen === ans) { st.weak[it.key].cleared = true; ok++; }
+        else { st.weak[it.key].cleared = false; }
         save(state); updateBadge(); done++;
         if (done === items.length) {
           const b = document.createElement("div"); b.className = "card center";

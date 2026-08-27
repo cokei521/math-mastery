@@ -1,22 +1,55 @@
-import time, os
+# -*- coding: utf-8 -*-
+"""
+math-mastery 可视化 QA 脚本（自包含版）
+
+- 路径相对化：截图输出到本脚本同级的 shots/
+- 内置临时静态服务器，无需手动起 http 服务
+- 浏览器优先用本机 Edge，缺失时回退 playwright 自带 chromium
+- 用法：python verify.py            （默认端口 8137）
+        PORT=9000 python verify.py  （自定义端口）
+依赖：pip install playwright && playwright install chromium
+"""
+import os, sys, time, json, threading
+import http.server, socketserver
+
 from playwright.sync_api import sync_playwright
 
-EDGE = r"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-BASE = "http://127.0.0.1:8137/"
-OUT = r"F:/workbuddy/math-mastery/shots"
+# ---- 路径相对化 ----
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = HERE                       # index.html 在本目录
+OUT = os.path.join(HERE, "shots")
 os.makedirs(OUT, exist_ok=True)
 
+PORT = int(os.environ.get("PORT", "8137"))
+BASE = "http://127.0.0.1:%d/" % PORT
+
+# ---- 内置静态服务器（守护线程，退出即销毁）----
+class _Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *a, **k):
+        super().__init__(*a, directory=ROOT, **k)
+    def log_message(self, *a, **k):
+        pass
+
+httpd = socketserver.TCPServer(("127.0.0.1", PORT), _Handler)
+threading.Thread(target=httpd.serve_forever, daemon=True).start()
+print("本地服务已启动：", BASE)
+
+EDGE = r"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 errors = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path=EDGE, args=["--no-sandbox"])
+    if os.path.exists(EDGE):
+        b = p.chromium.launch(executable_path=EDGE, args=["--no-sandbox"])
+    else:
+        print("未找到本机 Edge，回退 playwright 自带 chromium")
+        b = p.chromium.launch(args=["--no-sandbox"])
     pg = b.new_page(viewport={"width": 960, "height": 1040})
     pg.on("console", lambda m: errors.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
     pg.on("pageerror", lambda e: errors.append(f"pageerror: {e}"))
     pg.goto(BASE, wait_until="networkidle")
     # dynamically unlock every technique so all pages are open
     ids = pg.evaluate("window.TECHNIQUES.map(t=>t.id)")
-    seed = "{" + ",".join(f'"{i}":{{"mastered":true,"weak":{{}}}}' for i in ids) + "}"
-    pg.evaluate(f"localStorage.setItem('mathMastery.v1', {seed!r})")
+    seed = "{" + ",".join('"%s":{"mastered":true,"weak":{}}' % i for i in ids) + "}"
+    pg.evaluate("localStorage.setItem('mathMastery.v1', arguments[0])", seed)
     pg.reload(wait_until="networkidle")
     time.sleep(0.5)
 

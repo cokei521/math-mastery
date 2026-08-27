@@ -1,6 +1,35 @@
 # -*- coding: utf-8 -*-
-p = "F:/workbuddy/math-mastery/js/data.js"
+import os, re
+
+# 路径相对化：脚本同级目录
+HERE = os.path.dirname(os.path.abspath(__file__))
+p = os.path.join(HERE, "js", "data.js")
 s = open(p, encoding="utf-8").read()
+
+# 注入模块的 (stage, grade) 统一映射：把"高中 · 专题·..."旧命名收敛为数字年级
+INJECT_MAP = {
+    "trig_id": ("高中", "十一年级"), "complex": ("高中", "十年级"), "seqsum": ("高中", "十一年级"),
+    "deriv_mon": ("高中", "十二年级"), "deriv_ineq": ("高中", "十二年级"), "func_zero": ("高中", "十二年级"),
+    "conic_link": ("高中", "十二年级"), "conic_chord": ("高中", "十二年级"), "conic_prop": ("高中", "十二年级"),
+    "param_eq": ("高中", "十二年级"), "solid_axis": ("高中", "十一年级"), "solid_angle": ("高中", "十一年级"),
+    "dist_exp": ("高中", "十二年级"), "dist_binom": ("高中", "十二年级"), "stat_case": ("高中", "十二年级"),
+}
+# 幂等守卫：这些 id 已存在则跳过注入，避免重复追加
+already = [tid for tid in INJECT_MAP if ('id: "%s"' % tid) in s]
+if already:
+    print("已存在模块，跳过注入：", already)
+    raise SystemExit(0)
+
+def normalize_modules(text):
+    """把每个注入模块里的 grade 旧命名改写为 (grade, stage) 数字年级写法。"""
+    for tid, (stage, grade) in INJECT_MAP.items():
+        m = re.search(r'\{\s*id:\s*"%s"' % re.escape(tid), text)
+        if not m:
+            continue
+        seg = text[m.end():]
+        text = text[:m.end()] + re.sub(r'grade:\s*"[^"]*"',
+                'grade: "%s", stage: "%s"' % (grade, stage), seg, count=1)
+    return text
 
 modules = r'''
   /* ===================== 高中 · 专题·代数与函数 ===================== */
@@ -324,6 +353,7 @@ modules = r'''
 '''
 
 # 注入：把现有最后一个技巧对象的 `}` 后加逗号，再插入新模块，最后以 `];` 收尾
+modules = normalize_modules(modules)
 marker = "  }\n];"
 assert marker in s, "marker not found"
 new_tail = "  },\n" + modules + "];"
