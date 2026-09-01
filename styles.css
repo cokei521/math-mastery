@@ -142,8 +142,62 @@ h3{font-size:15px;margin:14px 0 6px}
 .res-why b{color:var(--warn)}
 .res-url{font-size:11px;color:var(--primary);margin-top:8px;word-break:break-all}
 
+/* 年级导航主页 */
+.grade-hero{background:linear-gradient(120deg,#1e3a8a,#2f6fed 55%,#5b8cff);border-radius:16px;padding:26px 22px;color:#fff;margin-bottom:22px;box-shadow:0 8px 24px rgba(47,111,237,.25);position:relative;overflow:hidden}
+.grade-hero::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
+.grade-hero::before{content:"";position:absolute;right:60px;bottom:-90px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)}
+.grade-hero-title{font-size:24px;font-weight:800;letter-spacing:1px}
+.grade-hero-sub{font-size:13px;opacity:.9;margin-top:8px}
+.stage-section{margin-bottom:26px}
+.stage-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);margin-bottom:12px;position:relative;overflow:hidden}
+.stage-head::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--stc)}
+.stage-ico{width:42px;height:42px;border-radius:12px;background:rgba(47,111,237,.10);display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto}
+.stage-txt{flex:1;min-width:0}
+.stage-name{font-weight:800;font-size:18px}
+.stage-sub{font-size:12px;color:var(--muted)}
+.stage-count{font-size:12px;font-weight:600;color:var(--stc);background:rgba(47,111,237,.10);padding:4px 12px;border-radius:20px;white-space:nowrap}
+.grade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.grade-card{display:flex;gap:12px;align-items:flex-start;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s,border-color .15s;position:relative;overflow:hidden}
+.grade-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.10);border-color:var(--primary)}
+.grade-card.all-done{border-color:#bfe6cc}
+.g-num{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#5b8cff);color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 4px 10px rgba(47,111,237,.3)}
+.grade-card.all-done .g-num{background:linear-gradient(135deg,var(--ok),#34d399)}
+.g-info{flex:1;min-width:0}
+.g-name{font-weight:700;font-size:16px;margin-bottom:6px}
+.g-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.g-chip{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--chip);color:var(--primary-d)}
+.g-chip.ok{background:#e7f6ee;color:var(--ok)}
+.g-chip.anim{background:#fdf0e3;color:var(--warn)}
+.g-bar{height:6px;border-radius:6px;background:#eef1f5;overflow:hidden;margin-bottom:8px}
+.g-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#5b8cff);border-radius:6px}
+.grade-card.all-done .g-bar > i{background:linear-gradient(90deg,var(--ok),#34d399)}
+.g-foot{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted)}
+.g-mode{color:var(--muted)}
+.g-go{color:var(--primary);font-weight:700}
+
+/* 年级学习页 */
+.grade-page-head{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px;box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden}
+.grade-page-head::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--stc)}
+.gph-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.gph-ico{width:52px;height:52px;border-radius:14px;background:rgba(47,111,237,.10);display:flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 auto}
+.gph-txt{flex:1;min-width:0}
+.gph-grade{font-weight:800;font-size:22px}
+.gph-stage{font-size:14px;font-weight:600;color:var(--stc)}
+.gph-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.gph-prog{text-align:center;background:rgba(47,111,237,.10);border-radius:12px;padding:8px 14px}
+.gph-pct{font-size:22px;font-weight:800;color:var(--stc)}
+.gph-pct-l{font-size:11px;color:var(--muted)}
+.gph-bar{height:8px;border-radius:6px;background:#eef1f5;overflow:hidden;margin:12px 0 10px}
+.gph-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--stc),rgba(47,111,237,.45));border-radius:6px}
+.gph-mode{font-size:12px;color:var(--muted);margin-bottom:10px}
+.grade-tech-list{display:flex;flex-direction:column;gap:10px}
+
 @media(max-width:560px){
   .brand-sub{display:none}
   .nav-link{font-size:12px;padding:6px 7px}
   .view{padding:12px}
+  .grade-hero{padding:20px 16px}
+  .grade-hero-title{font-size:20px}
+  .grade-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .stage-count{display:none}
 }

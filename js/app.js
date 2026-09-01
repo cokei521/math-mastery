@@ -84,6 +84,7 @@
     document.querySelectorAll(".nav-link").forEach(a => a.classList.toggle("active", a.dataset.route === parts[0]));
     updateBadge();
     if (parts[0] === "" || parts[0] === "path") return renderPath();
+    if (parts[0] === "grade") return renderGrade(decodeURIComponent(parts[1]));
     if (parts[0] === "learn") return renderLearn(parts[1]);
     if (parts[0] === "practice") return renderQuiz(parts[1], "practice");
     if (parts[0] === "gate") return renderQuiz(parts[1], "gate");
@@ -94,72 +95,152 @@
   }
   window.addEventListener("hashchange", route);
 
-  // 返回学习路径，并定位/高亮到指定技巧节点（避免回到页面最顶部）
+  // 返回学习路径（所在年级页），并定位/高亮到指定技巧节点（避免回到页面最顶部）
   function goPath(techId) {
+    const t = techId ? tech(techId) : null;
+    const target = t ? "#/grade/" + encodeURIComponent(gradeLabel(t.grade)) : "#/path";
     pendingScrollTech = techId || null;
-    if (location.hash.replace(/^#\/?/, "") === "path") renderPath();
-    else location.hash = "#/path";
+    const cur = location.hash.replace(/^#\/?/, "");
+    if (cur === target.slice(2)) route();
+    else location.hash = target;
   }
 
-  /* ---------------- 学习路径 ---------------- */
+  /* ---------------- 学习路径（年级导航主页） ---------------- */
+  const STAGES = ["小学", "中学", "高中"];
+  const STAGE_DESC = {
+    "小学": { sub: "1–6 年级 · 数与代数、图形、奥数启蒙", icon: "🏫", color: "#4f83f0" },
+    "中学": { sub: "7–9 年级 · 初中代数、几何、函数", icon: "📘", color: "#0f9d76" },
+    "高中": { sub: "10–12 年级 · 高中数学核心与专题", icon: "🎓", color: "#7c5ce0" }
+  };
+  // 年级的展示名称（十一年级+ 等变体归并到基准年级）
+  function gradeLabel(g) { return g.replace("+", ""); }
+  function gradeProgress(ts) {
+    const m = ts.filter(t => state[t.id] && state[t.id].mastered).length;
+    const l = ts.filter(t => { const st = state[t.id]; return st && !st.mastered && Object.keys(st.weak).length; }).length;
+    return { m, total: ts.length, pct: Math.round(m / ts.length * 100), l };
+  }
+  // 该年级是否整年级顺序解锁（小学各年级 + 初一初二），决定卡片副标题
+  function gradeUnlockMode(grade) {
+    const g = gradeNum(grade);
+    if (g >= 1 && g <= 6) return "顺序解锁";
+    if (g === 7 || g === 8) return "顺序解锁";
+    return "自由进入";
+  }
+  function gradeHasAnim(ts) { return ts.some(t => t.anim && window.Anim && window.Anim[t.anim]); }
+
   function renderPath() {
     const v = view(); v.innerHTML = "";
-    const h = document.createElement("h2"); h.className = "section"; h.textContent = "学习路径"; v.appendChild(h);
-    const hint = document.createElement("div"); hint.className = "hint";
-    hint.textContent = "按 小学 → 中学 → 高中 排列，细分到年级。小学各年级、初一·初二年级：年级内顺序解锁——第一个技巧是入口，掌握后才会解锁本年级下一个。初三及高中：所有技巧均可直接进入。练习做错的题进入「薄弱点」，复习通关才算掌握。";
-    v.appendChild(hint);
+    const hero = document.createElement("div"); hero.className = "grade-hero";
+    hero.innerHTML = `<div class="grade-hero-title">选择年级，开始融会贯通</div>
+      <div class="grade-hero-sub">从一年级到高中，按学段递进 · 逐级解锁 · 动画演示 · 薄弱点智能复习</div>`;
+    v.appendChild(hero);
 
-    const STAGES = ["小学", "中学", "高中"];
-    const STAGE_DESC = {
-      "小学": "1–6 年级 · 数与代数、图形、奥数启蒙",
-      "中学": "7–9 年级 · 初中代数、几何、函数",
-      "高中": "10–12 年级 · 高中数学核心与专题"
-    };
     const groups = {};
-    TECHNIQUES.forEach(t => { const k = t.stage + "|" + t.grade; (groups[k] = groups[k] || []).push(t); });
+    TECHNIQUES.forEach(t => { const k = t.stage + "|" + gradeLabel(t.grade); (groups[k] = groups[k] || []).push(t); });
 
-    let stepNo = 0;
-    STAGES.forEach(stage => {
-      const grades = [...new Set(TECHNIQUES.filter(t => t.stage === stage).map(t => t.grade))]
+    STAGES.forEach((stage, si) => {
+      const meta = STAGE_DESC[stage];
+      const grades = [...new Set(TECHNIQUES.filter(t => t.stage === stage).map(t => gradeLabel(t.grade)))]
         .sort((a, b) => gradeNum(a) - gradeNum(b));
       if (!grades.length) return;
-      const sb = document.createElement("div"); sb.className = "stage-banner";
-      sb.innerHTML = `<span class="stage-name">${stage}</span><span class="stage-desc">${STAGE_DESC[stage]}</span>`;
-      v.appendChild(sb);
+      const sec = document.createElement("div"); sec.className = "stage-section";
+      sec.innerHTML = `
+        <div class="stage-head" style="--stc:${meta.color}">
+          <span class="stage-ico">${meta.icon}</span>
+          <div class="stage-txt"><div class="stage-name">${stage}</div><div class="stage-sub">${meta.sub}</div></div>
+          <span class="stage-count">${grades.reduce((s, g) => s + groups[stage + "|" + g].length, 0)} 个技巧</span>
+        </div>
+        <div class="grade-grid">`;
+      const grid = sec.querySelector(".grade-grid");
       grades.forEach(g => {
-        const sub = document.createElement("div"); sub.className = "grade-sep";
-        sub.innerHTML = `<span class="grade-tag">${g}</span><span class="grade-count">${groups[stage + "|" + g].length} 个技巧</span>`;
-        v.appendChild(sub);
-        sortGroup(groups[stage + "|" + g]).forEach(t => {
-          stepNo++;
-          const st = tstate(t.id);
-          const open = unlocked(t.id);
-          const status = !open ? "lock" : (st.mastered ? "done" : "learn");
-          const node = document.createElement("div");
-          node.className = "node " + (status === "done" ? "mastered" : status === "lock" ? "locked" : "");
-          const weakN = Object.keys(st.weak).filter(k => !st.weak[k].cleared).length;
-          node.innerHTML = `
-            <div class="step">${status === "done" ? "✓" : stepNo}</div>
-            <div class="body">
-              <div class="title">${esc(t.name)}
-                ${status === "lock" ? '<span class="lock-ico">🔒</span>' : ""}
-                <span class="status-pill ${status === "lock" ? "lock" : status === "done" ? "done" : "learn"}">${status === "lock" ? "未解锁" : status === "done" ? "已掌握" : "学习中"}</span>
-                ${weakN ? `<span class="tag w">薄弱点 ${weakN}</span>` : ""}
-              </div>
-              <div class="meta">${esc(t.summary)}</div>
-              <div class="acts">
-                ${open ? `<a class="btn sm" href="#/learn/${t.id}">去学习</a>` : ""}
-                ${open ? `<a class="btn sm ghost" href="#/practice/${t.id}">练习</a>` : ""}
-                ${open && !st.mastered ? `<a class="btn sm soft" href="#/gate/${t.id}">通关测试</a>` : ""}
-              </div>
-              ${status === "lock" ? `<div class="meta" style="color:var(--lock)">需先掌握：${esc(tech(t.prereq).name)}</div>` : ""}
-            </div>`;
-          node.id = "node-" + t.id;
-          v.appendChild(node);
-        });
+        const ts = groups[stage + "|" + g];
+        const prog = gradeProgress(ts);
+        const anim = gradeHasAnim(ts);
+        const card = document.createElement("a");
+        card.className = "grade-card" + (prog.pct === 100 ? " all-done" : "");
+        card.href = "#/grade/" + encodeURIComponent(g);
+        card.innerHTML = `
+          <div class="g-num">${gradeNum(g) <= 12 ? gradeNum(g) : "+"}</div>
+          <div class="g-info">
+            <div class="g-name">${esc(gradeLabel(g))}</div>
+            <div class="g-meta">
+              <span class="g-chip">${ts.length} 技巧</span>
+              <span class="g-chip ${prog.pct === 100 ? "ok" : ""}">${prog.pct}%</span>
+              ${anim ? `<span class="g-chip anim">▶ 动画</span>` : ""}
+            </div>
+            <div class="g-bar"><i style="width:${prog.pct}%"></i></div>
+            <div class="g-foot">
+              <span class="g-mode">${gradeUnlockMode(g)}</span>
+              <span class="g-go">进入 →</span>
+            </div>
+          </div>`;
+        grid.appendChild(card);
       });
+      sec.appendChild(grid);
+      v.appendChild(sec);
     });
-    // 若从某技巧返回路径，自动定位并高亮该节点
+
+    const hint = document.createElement("div"); hint.className = "hint";
+    hint.textContent = "小学各年级、初一·初二年级：年级内顺序解锁——第一个技巧是入口，掌握后才会解锁本年级下一个。初三及高中：所有技巧均可直接进入。练习做错的题进入「薄弱点」，复习通关才算掌握。";
+    v.appendChild(hint);
+  }
+
+  /* ---------------- 年级学习页 ---------------- */
+  function renderGrade(g) {
+    const v = view(); v.innerHTML = "";
+    const ts = TECHNIQUES.filter(t => gradeLabel(t.grade) === g)
+      .sort((a, b) => ORDER[a.id] - ORDER[b.id]);
+    if (!ts.length) return renderPath();
+    const stage = ts[0].stage;
+    const meta = STAGE_DESC[stage];
+    const prog = gradeProgress(ts);
+
+    const head = document.createElement("div"); head.className = "grade-page-head" ;
+    head.style.setProperty("--stc", meta.color);
+    head.innerHTML = `
+      <div class="gph-row">
+        <div class="gph-ico">${meta.icon}</div>
+        <div class="gph-txt">
+          <div class="gph-grade">${esc(g)}<span class="gph-stage"> · ${esc(stage)}</span></div>
+          <div class="gph-sub">${meta.sub}</div>
+        </div>
+        <div class="gph-prog"><div class="gph-pct">${prog.pct}%</div><div class="gph-pct-l">已掌握 ${prog.m}/${prog.total}</div></div>
+      </div>
+      <div class="gph-bar"><i style="width:${prog.pct}%"></i></div>
+      <div class="gph-mode">${gradeUnlockMode(g)}：${gradeNum(g) >= 9 ? "本年级所有技巧均可直接进入，按需挑选。" : "掌握前一个技巧后，自动解锁下一个。"}</div>
+      <a class="btn ghost sm" id="gBack" href="#/path">← 返回年级导航</a>`;
+    v.appendChild(head);
+
+    const list = document.createElement("div"); list.className = "grade-tech-list"; v.appendChild(list);
+    ts.forEach(t => {
+      const st = tstate(t.id);
+      const open = unlocked(t.id);
+      const status = !open ? "lock" : (st.mastered ? "done" : "learn");
+      const weakN = Object.keys(st.weak).filter(k => !st.weak[k].cleared).length;
+      const hasAnim = t.anim && window.Anim && window.Anim[t.anim];
+      const node = document.createElement("div");
+      node.className = "node " + (status === "done" ? "mastered" : status === "lock" ? "locked" : "");
+      node.id = "node-" + t.id;
+      node.innerHTML = `
+        <div class="step">${status === "done" ? "✓" : (open ? "●" : "🔒")}</div>
+        <div class="body">
+          <div class="title">${esc(t.name)}
+            ${status === "lock" ? '<span class="lock-ico">🔒</span>' : ""}
+            ${hasAnim ? `<span class="tag">▶ 动画</span>` : ""}
+            <span class="status-pill ${status === "lock" ? "lock" : status === "done" ? "done" : "learn"}">${status === "lock" ? "未解锁" : status === "done" ? "已掌握" : "学习中"}</span>
+            ${weakN ? `<span class="tag w">薄弱点 ${weakN}</span>` : ""}
+          </div>
+          <div class="meta">${esc(t.summary)}</div>
+          <div class="acts">
+            ${open ? `<a class="btn sm" href="#/learn/${t.id}">去学习</a>` : ""}
+            ${open ? `<a class="btn sm ghost" href="#/practice/${t.id}">练习</a>` : ""}
+            ${open && !st.mastered ? `<a class="btn sm soft" href="#/gate/${t.id}">通关测试</a>` : ""}
+          </div>
+          ${status === "lock" ? `<div class="meta" style="color:var(--lock)">需先掌握：${esc(tech(t.prereq).name)}</div>` : ""}
+        </div>`;
+      list.appendChild(node);
+    });
+
     if (pendingScrollTech) {
       const el = document.getElementById("node-" + pendingScrollTech);
       if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1800); }
@@ -171,7 +252,7 @@
   function renderLearn(id) {
     const v = view(); v.innerHTML = "";
     const t = tech(id); if (!t) return renderPath();
-    if (!unlocked(id)) { toast("先融会贯通上一技巧才能解锁"); location.hash = "#/path"; return; }
+    if (!unlocked(id)) { toast("先融会贯通上一技巧才能解锁"); location.hash = "#/grade/" + encodeURIComponent(gradeLabel(t.grade)); return; }
     const st = tstate(id);
 
     const card = document.createElement("div"); card.className = "card";
@@ -195,7 +276,7 @@
     acts.innerHTML = `
       <a class="btn" href="#/practice/${t.id}">开始练习（${typeof t.qgen === "function" ? "每轮 8 题·随机" : t.questions.length + " 题"}）</a>
       ${!st.mastered ? `<a class="btn soft" href="#/gate/${t.id}">通关测试</a>` : `<span class="status-pill done">已掌握 ✓</span>`}
-      <a class="btn ghost" id="backBtnL" href="#/path">返回路径</a>`;
+      <a class="btn ghost" id="backBtnL" href="#/grade/${encodeURIComponent(gradeLabel(t.grade))}">返回年级</a>`;
     v.appendChild(acts);
     acts.querySelector("#backBtnL").addEventListener("click", (e) => { e.preventDefault(); goPath(t.id); });
   }
@@ -279,7 +360,7 @@
         }
       } else {
         banner.innerHTML = `<div class="qres">本轮完成 ${total} 题，正确 ${correct} 题。</div>
-          <a class="btn ghost" id="backBtn2" href="#/path">返回路径</a>`;
+          <a class="btn ghost" id="backBtn2" href="#/grade/${encodeURIComponent(gradeLabel(t.grade))}">返回年级</a>`;
         banner.querySelector("#backBtn2").addEventListener("click", (e) => { e.preventDefault(); goPath(t.id); });
       }
       list.appendChild(banner);
@@ -324,7 +405,7 @@
 
     if (mode === "practice") {
       const again = document.createElement("div"); again.className = "row"; again.style.margin = "6px 0 16px";
-      again.innerHTML = `<a class="btn ghost" id="againBtn" href="#/practice/${t.id}">🔄 再练一组</a><a class="btn soft" id="backBtn" href="#/path">返回路径</a>`;
+      again.innerHTML = `<a class="btn ghost" id="againBtn" href="#/practice/${t.id}">🔄 再练一组</a><a class="btn soft" id="backBtn" href="#/grade/${encodeURIComponent(gradeLabel(t.grade))}">返回年级</a>`;
       v.appendChild(again);
       // 关键修复：当前页 hash 与按钮 href 相同，hashchange 不会触发，需手动强制重渲染
       again.querySelector("#againBtn").addEventListener("click", (e) => {
@@ -430,7 +511,6 @@
 
     const h = document.createElement("h3"); h.textContent = "各技巧状态"; v.appendChild(h);
     const tree = document.createElement("div"); tree.className = "tree";
-    const STAGES = ["小学", "中学", "高中"];
     const groups = {};
     TECHNIQUES.forEach(t => { const k = t.stage + "|" + t.grade; (groups[k] = groups[k] || []).push(t); });
     STAGES.forEach(stage => {
