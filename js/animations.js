@@ -728,5 +728,61 @@ window.Anim = (function () {
     box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
   }
 
-  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape, tree, linearprog };
+  /* ---------- 拓展：正态分布 3σ 区间阴影 ---------- */
+  function normal(box) {
+    box.innerHTML = "";
+    const W = 360, H = 200, cx = 180, cy = 170, sigma = 55;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:360px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 10, y1: cy, x2: 350, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    const shade = el("rect", { x: cx, y: 20, width: 0, height: cy - 20, fill: "#eef3ff" });
+    svg.appendChild(shade);
+    let pts = [];
+    for (let i = 0; i <= 160; i++) { const x = 10 + i * 2.125; const t = (x - cx) / sigma; pts.push([x, cy - 130 * Math.exp(-t * t / 2)]); }
+    svg.appendChild(el("polyline", { points: pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "), fill: "none", stroke: "#2f6fed", "stroke-width": 2.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: 20, x2: cx, y2: cy, stroke: "#64748b", "stroke-dasharray": "3 3" }));
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn";
+    let k = 1;
+    function draw() {
+      const half = k * sigma;
+      shade.setAttribute("x", cx - half); shade.setAttribute("width", half * 2);
+      const map = { 1: "约 68.27%（[μ−σ, μ+σ]）", 2: "约 95.45%（[μ−2σ, μ+2σ]）", 3: "约 99.74%（[μ−3σ, μ+3σ]）" };
+      info.textContent = "3σ 原则：" + map[k];
+      btn.textContent = "切换区间（当前 " + k + "σ）";
+    }
+    btn.onclick = () => { k = k >= 3 ? 1 : k + 1; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  /* ---------- 拓展：复数乘 i 旋转 ---------- */
+  function cgeo(box) {
+    box.innerHTML = "";
+    const W = 300, H = 240, cx = 150, cy = 130, radius = Math.sqrt(60 * 60 + 50 * 50);
+    let theta = Math.atan2(50, 60);
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:300px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 20, y1: cy, x2: 280, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: 20, x2: cx, y2: 230, stroke: "#334155", "stroke-width": 1.5 }));
+    const line = el("line", { x1: cx, y1: cy, x2: cx + 60, y2: cy - 50, stroke: "#2f6fed", "stroke-width": 2 });
+    const dot = el("circle", { cx: cx + 60, cy: cy - 50, r: 6, fill: "#2f6fed" });
+    const label = el("text", { x: cx + 70, y: cy - 55, fill: "#334155", "font-size": 13 });
+    svg.appendChild(line); svg.appendChild(dot); svg.appendChild(label);
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = "▶ 乘 i（逆时针转 90°）";
+    function draw() {
+      const x = cx + radius * Math.cos(theta), y = cy - radius * Math.sin(theta);
+      dot.setAttribute("cx", x.toFixed(1)); dot.setAttribute("cy", y.toFixed(1));
+      line.setAttribute("x2", x.toFixed(1)); line.setAttribute("y2", y.toFixed(1));
+      const a = Math.round(radius * Math.cos(theta)), b = Math.round(radius * Math.sin(theta));
+      label.textContent = `z = ${a} + ${b}i`;
+      info.textContent = "复数乘 i：辐角 +π/2，即逆时针旋转 90°。";
+    }
+    btn.onclick = () => { theta += Math.PI / 2; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape, tree, linearprog, normal, cgeo };
 })();

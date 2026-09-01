@@ -1395,6 +1395,244 @@
   }
 
   /* ============================================================
+   * 拓展第三批：衔接 / 大学预备方法（8 个）
+   * ============================================================ */
+  function qFullProb(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const p1 = rnd(3, 7) / 10;
+        const a = rnd(4, 9) / 10;
+        const b = rnd(1, 4) / 10;
+        const pb = p1 * a + (1 - p1) * b;
+        o = opts(pb.toFixed(2), () => (p1 * a).toFixed(2), () => (a * b).toFixed(2), () => ((1 - p1) * b).toFixed(2));
+        q = `A1、A2 为完备事件组，P(A1)=${p1.toFixed(1)}，P(B|A1)=${a.toFixed(1)}，P(B|A2)=${b.toFixed(1)}。由全概率公式求 P(B)=？`;
+        exp = `P(B)=P(A1)P(B|A1)+P(A2)P(B|A2)=${p1.toFixed(1)}×${a.toFixed(1)}+${(1-p1).toFixed(1)}×${b.toFixed(1)}=${pb.toFixed(2)}。`;
+      } else if (type === 1) {
+        const k = rnd(2, 9);
+        o = opts(`1/${k}`, () => `1/${k+1}`, () => `2/${k}`, () => `${(k-1)}/${k}`);
+        q = `抽签问题：共 ${k} 张签中有 1 张中奖，第 1 个人抽中的概率是？`;
+        exp = `抽签公平：无论先后，每人抽中概率都是 1/${k}。`;
+      } else if (type === 2) {
+        const p = rnd(1, 6) / 100;
+        const sens = rnd(8, 9) / 10;
+        const ppos = p * sens + (1 - p) * 0.05;
+        o = opts(ppos.toFixed(3), () => (p * sens).toFixed(3), () => sens.toFixed(3), () => p.toFixed(3));
+        q = `某病患病率 ${p.toFixed(2)}，检测灵敏度 ${sens.toFixed(1)}、误诊率 0.05。随机一人检测呈阳性的概率约为？`;
+        exp = `P(阳性)=P(病)P(阳|病)+P(无病)P(阳|无病)=${p.toFixed(2)}×${sens.toFixed(1)}+${(1-p).toFixed(2)}×0.05≈${ppos.toFixed(3)}。`;
+      } else {
+        o = opts("由因导果求总概率", () => "由果溯因", () => "求期望", () => "求方差");
+        q = "全概率公式主要用于？";
+        exp = "全概率公式由“原因”推“结果”的总概率；贝叶斯公式才是由果溯因。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "全概率公式"));
+    }
+    return results;
+  }
+
+  function qNormalApp(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("约 68.27%", () => "约 95.45%", () => "约 99.74%", () => "约 50%");
+        q = "正态分布 N(μ,σ²) 中，落入 [μ−σ, μ+σ] 的概率约为？";
+        exp = "3σ 原则：P(μ−σ<X<μ+σ)≈0.6827（约 68.27%）。";
+      } else if (type === 1) {
+        o = opts("约 95.45%", () => "约 68.27%", () => "约 99.74%", () => "约 34.13%");
+        q = "N(μ,σ²) 中，落入 [μ−2σ, μ+2σ] 的概率约为？";
+        exp = "P(μ−2σ<X<μ+2σ)≈0.9545（约 95.45%）。";
+      } else if (type === 2) {
+        const mu = rnd(95, 105), sig = rnd(2, 8);
+        o = opts(`[${mu-sig}, ${mu+sig}]`, () => `[${mu-2*sig}, ${mu+2*sig}]`, () => `[${mu}, ${mu+sig}]`, () => `[${mu-sig}, ${mu}]`);
+        q = `某指标 X~N(${mu}, ${sig}²)，约 68.27% 的数据落在哪个区间？`;
+        exp = `[μ−σ, μ+σ] = [${mu-sig}, ${mu+sig}]。`;
+      } else {
+        o = opts("μ 决定位置，σ 决定胖瘦", () => "都决定位置", () => "都决定胖瘦", () => "无关");
+        q = "正态分布参数 μ 与 σ 的几何意义是？";
+        exp = "μ 是对称中心（位置），σ 是离散程度（胖瘦）。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "正态分布"));
+    }
+    return results;
+  }
+
+  function qDefiniteInt(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("0", () => "1", () => "∞", () => "f(a)");
+        q = "定积分 ∫_a^a f(x) dx = ？";
+        exp = "上下限相同，积分区间长度为 0，故为 0。";
+      } else if (type === 1) {
+        const b = rnd(2, 5);
+        const ans = b * b + b;
+        o = opts(`${ans}`, () => `${b*b}`, () => `${b}`, () => `${(b+1)*(b+1)}`);
+        q = `∫_0^${b} (2x+1) dx = ？`;
+        exp = `原函数 x²+x，代入得 ${b}²+${b} = ${ans}。`;
+      } else if (type === 2) {
+        o = opts("2", () => "0", () => "π", () => "1");
+        q = "∫_0^π sin x dx = ？";
+        exp = "原函数 −cos x，−cos π − (−cos 0) = 1 + 1 = 2。";
+      } else {
+        o = opts("∫_a^c = ∫_a^b + ∫_b^c", () => "∫_a^c = ∫_a^b − ∫_b^c", () => "∫_a^c = ∫_a^b · ∫_b^c", () => "∫_a^c = 0");
+        q = "定积分的区间可加性是？";
+        exp = "∫_a^c f(x)dx = ∫_a^b f(x)dx + ∫_b^c f(x)dx（b 在 a、c 之间）。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "定积分"));
+    }
+    return results;
+  }
+
+  function qDiffEq(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const k = rnd(2, 4);
+        o = opts(`y = C·e^{${k}x}`, () => `y = C·x^${k}`, () => `y = e^{${k}x} + C`, () => `y = C·${k}x`);
+        q = `微分方程 dy/dx = ${k}y 的通解是？`;
+        exp = `分离变量：dy/y = ${k}dx → ln|y| = ${k}x + C → y = C·e^{${k}x}。`;
+      } else if (type === 1) {
+        o = opts("y = x² + C", () => "y = x³ + C", () => "y = 2x + C", () => "y = e^x + C");
+        q = "dy/dx = 2x 的通解是？";
+        exp = "两边积分：y = ∫2x dx = x² + C。";
+      } else if (type === 2) {
+        o = opts("y² = x² + C", () => "y = x² + C", () => "y² = 2x + C", () => "y = x + C");
+        q = "由 dy/dx = x/y（y≠0）分离变量并积分得？";
+        exp = "y dy = x dx → y²/2 = x²/2 + C → y² = x² + C（C 任意常数）。";
+      } else {
+        o = opts("含未知函数导数的方程", () => "代数方程", () => "不等式", () => "积分方程");
+        q = "微分方程是指？";
+        exp = "含有未知函数及其导数（或微分）的方程。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "微分方程"));
+    }
+    return results;
+  }
+
+  function qIneqScale(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("1/(n(n+1)) < 1/n", () => "1/(n(n+1)) > 1/n", () => "1/(n(n+1)) = 1/n", () => "1/(n(n+1)) > 1/n²");
+        q = "放缩技巧：当 n>0 时，1/(n(n+1)) 与 1/n 的关系是？（裂项放缩基础）";
+        exp = "分母 n(n+1) > n，故 1/(n(n+1)) < 1/n。常用于把级数放缩成易求和形式。";
+      } else if (type === 1) {
+        o = opts("放大成可求和的已知数列", () => "缩小成等差", () => "取对数", () => "平方");
+        q = "证明 Σ 1/n² 收敛，常用放缩思路是？";
+        exp = "把 1/n² 放缩为 1/(n(n-1)) = 1/(n-1) − 1/n，裂项成可求和形式。";
+      } else if (type === 2) {
+        const a = rnd(2, 5);
+        o = opts(`S_n < a`, () => `S_n > a`, () => `S_n = a`, () => `S_n < 0`);
+        q = `已知 0<a_n≤${a}、a_{n+1}≤a_n（递减有上界），则前 n 项和 S_n 满足？`;
+        exp = "每项 ≤ ${a}，故 S_n = Σ a_k ≤ n·${a}；更强地由单调有界知 S_n 有上界。此处给出每项上界 ${a}。";
+      } else {
+        o = opts("把难求的式放缩到易求范围", () => "精确计算", () => "求导", () => "积分");
+        q = "不等式放缩法的主要目的是？";
+        exp = "当精确值难求时，把目标式放缩到容易求和/比较的范围，从而证明不等式或估计大小。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "放缩法"));
+    }
+    return results;
+  }
+
+  function qSeqIneq(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("数学归纳法", () => "代入法", () => "配方法", () => "换元法");
+        q = "证明对一切 n∈N* 都有 a_n < M，最常用的方法是？";
+        exp = "由 n=1 验证、假设 n=k 再推 n=k+1，即数学归纳法。";
+      } else if (type === 1) {
+        o = opts("单调有界数列必收敛", () => "单调必发散", () => "有界必发散", () => "无界必收敛");
+        q = "数列极限存在准则“单调有界定理”内容是？";
+        exp = "单调递增（减）且有上（下）界的数列必收敛。";
+      } else if (type === 2) {
+        const c = rnd(2, 5);
+        o = opts(`≤ ${c}`, () => `≥ ${c}`, () => `= ${c}`, () => `< 0`);
+        q = `已知 a_1 = ${c} 且数列 {a_n} 单调递减，则对任意 n 有 a_n ？`;
+        exp = `单调递减 ⇒ a_n ≤ a_1 = ${c}。`;
+      } else {
+        o = opts("先放缩再求和", () => "直接求通项", () => "求导", () => "积分");
+        q = "证明 Σ a_n < M（a_n>0）常用思路？";
+        exp = "先放缩 a_n 到可求和的已知数列（如等比、裂项），再求和得上界。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "数列不等式"));
+    }
+    return results;
+  }
+
+  function qComplexGeo(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(2, 5), b = rnd(1, 4);
+        const r = Math.sqrt(a*a + b*b);
+        o = opts(`${r.toFixed(2)}`, () => `${a}`, () => `${b}`, () => `${a+b}`);
+        q = `复数 z = ${a} + ${b}i 的模 |z|（几何意义：到原点距离）为？`;
+        exp = `|z| = √(a²+b²) = √(${a}²+${b}²) = ${r.toFixed(2)}。`;
+      } else if (type === 1) {
+        const a = rnd(2, 4), b = rnd(1, 3);
+        o = opts(`${b} − ${a}i`, () => `${a} + ${b}i`, () => `−${a} + ${b}i`, () => `${b} + ${a}i`);
+        q = `复数 z = ${a} + ${b}i 乘 i 后等于？（i·(a+bi)）`;
+        exp = `i(a+bi) = ai + bi² = −b + ai = ${b}−${a}i（相当于逆时针旋转 90°）。`;
+      } else if (type === 2) {
+        o = opts("关于实轴对称", () => "关于原点对称", () => "逆时针转 90°", () => "放大");
+        q = "共轭复数 z̄ 的几何意义是？";
+        exp = "z=a+bi 与 z̄=a−bi 实部相同、虚部相反，关于实轴对称。";
+      } else {
+        o = opts("辐角 arg(z)", () => "模长", () => "实部", () => "虚部");
+        q = "复数 z 对应向量与正实轴的夹角称为？";
+        exp = "该夹角称为辐角 arg(z)。";
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "复数几何"));
+    }
+    return results;
+  }
+
+  function qSeries(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("|r| < 1", () => "|r| > 1", () => "r > 0", () => "r < 1");
+        q = "等比级数 Σ_{n=0}^∞ a rⁿ 收敛的充要条件是？";
+        exp = "公比绝对值 |r| < 1 时收敛，否则发散。";
+      } else if (type === 1) {
+        o = opts("p > 1", () => "p > 0", () => "p ≥ 1", () => "p < 1");
+        q = "p 级数 Σ 1/n^p 收敛的条件是？";
+        exp = "p > 1 收敛，p ≤ 1 发散（p=1 为调和级数，发散）。";
+      } else if (type === 2) {
+        o = opts("发散", () => "收敛于 1", () => "收敛于 0", () => "收敛于 ln2");
+        q = "调和级数 Σ_{n=1}^∞ 1/n 的敛散性是？";
+        exp = "调和级数发散（虽通项趋于 0，但部分和趋于 ∞）。";
+      } else {
+        const r = rnd(2, 5) / 10;
+        const sum = r / (1 - r);
+        o = opts(`${sum.toFixed(2)}`, () => `${r.toFixed(2)}`, () => `${(1/(1-r)).toFixed(2)}`, () => `${(r*r).toFixed(2)}`);
+        q = `级数 Σ_{n=1}^∞ ${r.toFixed(1)}ⁿ 的和（首项 ${r.toFixed(1)}、公比 ${r.toFixed(1)}）是？`;
+        exp = `等比求和（从 n=1 起）= a/(1−r) = ${r.toFixed(1)}/(1−${r.toFixed(1)}) = ${sum.toFixed(2)}。`;
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "数项级数"));
+    }
+    return results;
+  }
+
+  /* ============================================================
    * 注册到 window.TECHNIQUES
    * ============================================================ */
   const GEN = {
@@ -1414,6 +1652,14 @@
     lhopital: qLhopital,
     mvt: qMvt,
     bayes: qBayes,
+    fullprob: qFullProb,
+    normal_app: qNormalApp,
+    definite_int: qDefiniteInt,
+    diffeq: qDiffEq,
+    ineq_scale: qIneqScale,
+    seq_ineq: qSeqIneq,
+    complex_geo: qComplexGeo,
+    series: qSeries,
     set: qSet,
     funcconcept: qFuncConcept,
     explog: qExpLog,

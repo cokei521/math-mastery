@@ -1062,7 +1062,15 @@
     "matrix::0": "matrix_det", "matrix::1": "matrix_det", "matrix::2": "matrix_det", "matrix::3": "matrix_det",
     "lhopital::0": "lhopital_graph", "lhopital::1": "lhopital_graph", "lhopital::2": "lhopital_graph", "lhopital::3": "lhopital_graph",
     "mvt::0": "mvt_tangent", "mvt::1": "mvt_tangent", "mvt::2": "mvt_tangent", "mvt::3": "mvt_tangent",
-    "bayes::0": "bayes_tree", "bayes::1": "bayes_tree", "bayes::2": "bayes_tree", "bayes::3": "bayes_tree"
+    "bayes::0": "bayes_tree", "bayes::1": "bayes_tree", "bayes::2": "bayes_tree", "bayes::3": "bayes_tree",
+    "fullprob::0": "fullprob_tree", "fullprob::1": "fullprob_tree", "fullprob::2": "fullprob_tree", "fullprob::3": "fullprob_tree",
+    "normal_app::0": "normal_curve", "normal_app::1": "normal_curve", "normal_app::2": "normal_curve", "normal_app::3": "normal_curve",
+    "definite_int::0": "definite_area", "definite_int::1": "definite_area", "definite_int::2": "definite_area", "definite_int::3": "definite_area",
+    "diffeq::0": "diffeq_slope", "diffeq::1": "diffeq_slope", "diffeq::2": "diffeq_slope", "diffeq::3": "diffeq_slope",
+    "ineq_scale::0": "ineq_scale", "ineq_scale::1": "ineq_scale", "ineq_scale::2": "ineq_scale", "ineq_scale::3": "ineq_scale",
+    "seq_ineq::0": "seq_ineq", "seq_ineq::1": "seq_ineq", "seq_ineq::2": "seq_ineq", "seq_ineq::3": "seq_ineq",
+    "complex_geo::0": "complex_plane", "complex_geo::1": "complex_plane", "complex_geo::2": "complex_plane", "complex_geo::3": "complex_plane",
+    "series::0": "series_partial", "series::1": "series_partial", "series::2": "series_partial", "series::3": "series_partial"
   };
 
 
@@ -1263,6 +1271,124 @@
     s += `<circle cx="235" cy="115" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/><circle cx="235" cy="145" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/>`;
     s += `<text x="96" y="172" fill="${K.sub}" font-size="11">观测“结果”后，反推各原因概率</text>`;
     return S(300, 185, s);
+  };
+
+  Fig.fullprob_tree = function () {
+    const W = 300, H = 200;
+    let s = `<line x1="40" y1="40" x2="40" y2="170" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<circle cx="40" cy="40" r="5" fill="${K.pri}"/>`;
+    s += `<text x="48" y="44" fill="${K.ink}" font-size="12">样本空间</text>`;
+    s += `<line x1="40" y1="60" x2="130" y2="110" stroke="${K.sub}" stroke-width="1.2"/>`;
+    s += `<line x1="40" y1="60" x2="130" y2="60" stroke="${K.sub}" stroke-width="1.2"/>`;
+    s += `<circle cx="130" cy="110" r="4" fill="${K.ok}"/>`;
+    s += `<circle cx="130" cy="60" r="4" fill="${K.ok}"/>`;
+    s += `<text x="138" y="114" fill="${K.ink}" font-size="12">A₁</text>`;
+    s += `<text x="138" y="64" fill="${K.ink}" font-size="12">A₂</text>`;
+    s += `<line x1="130" y1="110" x2="220" y2="150" stroke="${K.warn}" stroke-width="1.2"/>`;
+    s += `<line x1="130" y1="60" x2="220" y2="150" stroke="${K.warn}" stroke-width="1.2"/>`;
+    s += `<circle cx="220" cy="150" r="5" fill="${K.warn}"/>`;
+    s += `<text x="228" y="154" fill="${K.ink}" font-size="12">B（汇总 P）</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.normal_curve = function () {
+    const W = 300, H = 180, cx = 150, cy = 150;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    for (let i = 0; i < 120; i++) {
+      const x = 10 + i * 2.33;
+      const t = (x - cx) / 55;
+      const y = cy - 120 * Math.exp(-t * t / 2);
+      s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="0.9" fill="${K.pri}"/>`;
+    }
+    s += `<rect x="${cx-55}" y="20" width="110" height="${cy-20}" fill="${K.soft}" opacity="0.5"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="${cy}" stroke="${K.sub}" stroke-dasharray="3 3"/>`;
+    s += `<text x="${cx-30}" y="${cy-6}" fill="${K.pri}" font-size="11">μ</text>`;
+    s += `<text x="14" y="14" fill="${K.sub}" font-size="11">μ−σ　μ+σ</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.definite_area = function () {
+    const W = 300, H = 200, cx = 30, cy = 170;
+    const X = v => cx + v * 50, Y = v => cy - v * 40;
+    let s = `<line x1="${cx}" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    let pts = [];
+    for (let i = 0; i <= 4.0001; i += 0.1) pts.push([X(i), Y(i * i / 4)]);
+    s += `<polyline points="${pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ")}" fill="none" stroke="${K.pri}" stroke-width="2"/>`;
+    s += `<polygon points="${cx},${cy} ${X(4)},${cy} ${pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ")}" fill="${K.soft}" opacity="0.6"/>`;
+    s += `<text x="${cx+10}" y="30" fill="${K.sub}" font-size="12">∫_a^b f(x)dx = 面积</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.diffeq_slope = function () {
+    const W = 300, H = 200, cx = 30, cy = 170;
+    let s = `<line x1="${cx}" y1="20" x2="${cx}" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    for (let gx = 0; gx < 5; gx++) for (let gy = 0; gy < 4; gy++) {
+      const px = cx + 30 + gx * 45, py = cy - 30 - gy * 40;
+      s += `<line x1="${px-10}" y1="${py-10}" x2="${px+10}" y2="${py+10}" stroke="${K.sub}" stroke-width="1"/>`;
+      s += `<circle cx="${px}" cy="${py}" r="1.5" fill="${K.pri}"/>`;
+    }
+    s += `<path d="M ${cx+30} ${cy-30} Q ${cx+120} ${cy-90} ${cx+220} ${cy-160}" fill="none" stroke="${K.warn}" stroke-width="2.5"/>`;
+    s += `<text x="${cx+10}" y="30" fill="${K.sub}" font-size="12">方向场 + 积分曲线</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.ineq_scale = function () {
+    const W = 300, H = 160;
+    let s = `<line x1="20" y1="80" x2="280" y2="80" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<rect x="40" y="64" width="200" height="32" rx="6" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<text x="120" y="85" fill="${K.ink}" font-size="13">目标式（难求）</text>`;
+    s += `<rect x="20" y="110" width="240" height="30" rx="6" fill="${K.ok}" opacity="0.18" stroke="${K.ok}" stroke-width="1.5"/>`;
+    s += `<text x="40" y="130" fill="${K.ok}" font-size="12">放缩到易求和/比较的范围</text>`;
+    s += `<text x="150" y="58" fill="${K.sub}" font-size="20" text-anchor="middle">↓ 放缩</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.seq_ineq = function () {
+    const W = 300, H = 180;
+    let s = `<line x1="20" y1="150" x2="280" y2="150" stroke="${K.ink}" stroke-width="1.5"/>`;
+    const ys = [150, 120, 100, 88, 80, 76, 74, 73];
+    for (let i = 0; i < ys.length; i++) {
+      const x = 30 + i * 34;
+      s += `<circle cx="${x}" cy="${ys[i]}" r="4" fill="${K.pri}"/>`;
+      if (i > 0) s += `<line x1="${x-34}" y1="${ys[i-1]}" x2="${x}" y2="${ys[i]}" stroke="${K.sub}" stroke-width="1.2"/>`;
+    }
+    s += `<line x1="20" y1="60" x2="280" y2="60" stroke="${K.ok}" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+    s += `<text x="200" y="55" fill="${K.ok}" font-size="12">上界 M（单调有界）</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.complex_plane = function () {
+    const W = 300, H = 220, cx = 150, cy = 110;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="200" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<text x="270" y="${cy-6}" fill="${K.sub}" font-size="11">实轴</text>`;
+    s += `<text x="${cx+6}" y="30" fill="${K.sub}" font-size="11">虚轴</text>`;
+    const px = cx + 60, py = cy - 50;
+    s += `<line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" stroke="${K.pri}" stroke-width="2"/>`;
+    s += `<circle cx="${px}" cy="${py}" r="5" fill="${K.pri}"/>`;
+    s += `<text x="${px+6}" y="${py-6}" fill="${K.ink}" font-size="12">z=a+bi</text>`;
+    s += `<text x="${cx+4}" y="${cy+14}" fill="${K.sub}" font-size="11">O</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.series_partial = function () {
+    const W = 300, H = 180, cx = 30, cy = 150;
+    let s = `<line x1="${cx}" y1="20" x2="${cx}" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    const terms = [0.5, 0.75, 0.875, 0.9375, 0.96875, 0.984375];
+    let px = cx, py = cy;
+    s += `<circle cx="${px}" cy="${py}" r="3" fill="${K.pri}"/>`;
+    terms.forEach((t, i) => {
+      const nx = cx + 35 + i * 40, ny = cy - t * 120;
+      s += `<line x1="${px}" y1="${py}" x2="${nx}" y2="${ny}" stroke="${K.sub}" stroke-width="1.2"/>`;
+      s += `<circle cx="${nx}" cy="${ny}" r="3.5" fill="${K.pri}"/>`;
+      px = nx; py = ny;
+    });
+    s += `<line x1="${cx}" y1="${cy-120}" x2="280" y2="${cy-120}" stroke="${K.ok}" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+    s += `<text x="190" y="${cy-126}" fill="${K.ok}" font-size="11">极限和 S</text>`;
+    return S(W, H, s);
   };
 
   window.Fig = Fig;
