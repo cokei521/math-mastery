@@ -126,6 +126,22 @@ h3{font-size:15px;margin:14px 0 6px}
 .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:#1f2937;color:#fff;padding:10px 18px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hint{font-size:13px;color:var(--muted);background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}
+
+/* 相关项目推荐 */
+.res-cat{margin:0 0 6px;font-size:16px;color:var(--primary-d)}
+.res-desc{font-size:13px;color:var(--muted);margin-bottom:12px}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.res-item{display:block;text-decoration:none;background:#fbfdff;border:1px solid var(--line);border-radius:10px;padding:12px;transition:.12s}
+.res-item:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.res-name{font-weight:700;font-size:15px;color:var(--ink)}
+.res-tags{display:flex;gap:5px;flex-wrap:wrap}
+.res-tag{font-size:11px;padding:2px 7px;border-radius:20px;background:#eef3ff;color:var(--primary-d)}
+.res-summary{font-size:13px;color:var(--ink);margin-bottom:8px;line-height:1.5}
+.res-why{font-size:12px;color:var(--muted);line-height:1.5}
+.res-why b{color:var(--warn)}
+.res-url{font-size:11px;color:var(--primary);margin-top:8px;word-break:break-all}
+
 @media(max-width:560px){
   .brand-sub{display:none}
   .nav-link{font-size:12px;padding:6px 7px}

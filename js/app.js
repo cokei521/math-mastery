@@ -89,6 +89,7 @@
     if (parts[0] === "gate") return renderQuiz(parts[1], "gate");
     if (parts[0] === "review") return renderReview();
     if (parts[0] === "progress") return renderProgress();
+    if (parts[0] === "resources") return renderResources();
     renderPath();
   }
   window.addEventListener("hashchange", route);
@@ -460,6 +461,47 @@
       });
     });
     v.appendChild(tree);
+  }
+
+  /* ---------------- 相关项目推荐 ---------------- */
+  function renderResources() {
+    const v = view(); v.innerHTML = "";
+    const h = document.createElement("h2"); h.className = "section"; h.textContent = "相关项目与资源"; v.appendChild(h);
+    const hint = document.createElement("div"); hint.className = "hint";
+    hint.textContent = "这里汇集了和「融会贯通」定位相近的可视化数学学习项目：动画引擎、开源练习平台、商业参考课程、资源清单。点击卡片可访问官网或仓库。";
+    v.appendChild(hint);
+
+    const cats = window.RELATED_PROJECTS || [];
+    cats.forEach(cat => {
+      const wrap = document.createElement("div"); wrap.className = "card";
+      wrap.innerHTML = `<h3 class="res-cat">${esc(cat.category)}</h3>
+        <div class="res-desc">${esc(cat.desc)}</div>`;
+      const grid = document.createElement("div"); grid.className = "res-grid";
+      (cat.items || []).forEach(it => {
+        const link = it.cnUrl || it.url;
+        const card = document.createElement("a");
+        card.className = "res-item";
+        card.href = link;
+        card.target = "_blank";
+        card.rel = "noopener noreferrer";
+        const tags = (it.tags || []).map(tg => `<span class="res-tag">${esc(tg)}</span>`).join("");
+        card.innerHTML = `
+          <div class="res-head">
+            <span class="res-name">${esc(it.name)}</span>
+            <span class="res-tags">${tags}</span>
+          </div>
+          <div class="res-summary">${esc(it.summary)}</div>
+          <div class="res-why"><b>为什么收录：</b>${esc(it.why)}</div>
+          <div class="res-url">${esc(link)}</div>`;
+        grid.appendChild(card);
+      });
+      wrap.appendChild(grid);
+      v.appendChild(wrap);
+    });
+
+    if (!cats.length) {
+      v.innerHTML += `<div class="empty">暂无推荐资源</div>`;
+    }
   }
 
   route();
