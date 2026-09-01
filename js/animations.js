@@ -657,5 +657,76 @@ window.Anim = (function () {
     box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
   }
 
-  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape };
+  /* ---------- 拓展：树状图法（逐步生长） ---------- */
+  function tree(box) {
+    box.innerHTML = "";
+    const W = 320, H = 220;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:320px;height:auto;display:block" });
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = "▶ 逐步生长";
+    const root = { x: 40, y: 110 };
+    const L1 = [{ x: 130, y: 66 }, { x: 130, y: 154 }];
+    const L2 = [{ x: 226, y: 40 }, { x: 226, y: 92 }, { x: 226, y: 128 }, { x: 226, y: 180 }];
+    const edges = [[root, L1[0]], [root, L1[1]], [L1[0], L2[0]], [L1[0], L2[1]], [L1[1], L2[2]], [L1[1], L2[3]]];
+    const nodes = [root, ...L1, ...L2];
+    const labels = ["开始", "选①", "选②", "①·A", "①·B", "②·A", "②·B"];
+    let step = 0, timer = null;
+    function render() {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      const layerOf = i => i === 0 ? 0 : (i <= 2 ? 1 : 2);
+      edges.forEach((e, i) => {
+        const layer = i < 2 ? 1 : 2;
+        if (step >= layer) svg.appendChild(el("line", { x1: e[0].x, y1: e[0].y, x2: e[1].x, y2: e[1].y, stroke: "#cbd5e1", "stroke-width": 2 }));
+      });
+      nodes.forEach((n, i) => {
+        const layer = layerOf(i);
+        if (step >= layer) {
+          svg.appendChild(el("circle", { cx: n.x, cy: n.y, r: 14, fill: "#eef3ff", stroke: "#2f6fed", "stroke-width": 1.5 }));
+          const t = el("text", { x: n.x - 12, y: n.y + 4, "font-size": 11, fill: "#334155" });
+          t.textContent = labels[i];
+          svg.appendChild(t);
+        }
+      });
+      info.textContent = step === 0 ? "根节点" : step === 1 ? "第一层分支：2 种选择" : "第二层展开 → 2 × 2 = 4 种结果";
+    }
+    function advance() { step = step >= 2 ? 0 : step + 1; render(); }
+    btn.onclick = () => { if (timer) { clearInterval(timer); timer = null; btn.textContent = "▶ 逐步生长"; return; } btn.textContent = "⏸ 自动"; timer = setInterval(advance, 900); };
+    render();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  /* ---------- 拓展：线性规划（目标线平移） ---------- */
+  function linearprog(box) {
+    box.innerHTML = "";
+    const W = 320, H = 240, ox = 30, oy = 210;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:320px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: ox, y1: 20, x2: ox, y2: oy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: ox, y1: oy, x2: 300, y2: oy, stroke: "#334155", "stroke-width": 1.5 }));
+    const sx = v => ox + v * 42, sy = v => oy - v * 42;
+    svg.appendChild(el("polygon", { points: `${sx(0)},${sy(0)} ${sx(4)},${sy(0)} ${sx(0)},${sy(4)}`, fill: "#eef3ff", stroke: "#2f6fed", "stroke-width": 1.5 }));
+    [[0, 4, "(0,4)"], [4, 0, "(4,0)"], [0, 0, "(0,0)"]].forEach(p => {
+      svg.appendChild(el("circle", { cx: sx(p[0]), cy: sy(p[1]), r: 4, fill: "#dc2626" }));
+      const t = el("text", { x: sx(p[0]) + (p[0] === 0 ? 6 : -30), y: sy(p[1]) + (p[1] === 0 ? 16 : -6), "font-size": 11, fill: "#dc2626" });
+      t.textContent = p[2]; svg.appendChild(t);
+    });
+    const line = el("line", { x1: sx(0), y1: sy(0), x2: sx(0), y2: sy(0), stroke: "#d97706", "stroke-width": 2.5 });
+    svg.appendChild(line);
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn";
+    let c = 0, timer = null;
+    function draw() {
+      const cc = Math.min(c, 4);
+      line.setAttribute("x1", sx(0)); line.setAttribute("y1", sy(cc));
+      line.setAttribute("x2", sx(cc)); line.setAttribute("y2", sy(0));
+      info.textContent = `目标线 x+y = ${cc.toFixed(1)}：z 随高度增大，在顶点 (0,4) 处最大 = 4`;
+      btn.textContent = `▶ 平移目标线（z=${cc.toFixed(1)}）`;
+    }
+    btn.onclick = () => { if (timer) { clearInterval(timer); timer = null; btn.textContent = "▶ 平移"; return; } btn.textContent = "⏸ 暂停"; timer = setInterval(() => { c += 0.4; if (c > 4.3) c = 0; draw(); }, 120); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape, tree, linearprog };
 })();

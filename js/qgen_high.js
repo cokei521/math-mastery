@@ -1153,6 +1153,248 @@
   }
 
   /* ============================================================
+   * 拓展专题（第二批）：树状图法、排列组合、柯西不等式、
+   *       线性规划、矩阵与行列式、洛必达法则、中值定理、贝叶斯
+   * ============================================================ */
+  function qTree(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(2, 4), b = rnd(2, 4);
+        o = opts(`${a * b} 种`, () => `${a + b} 种`, () => `${a} 种`, () => `${a * b + 1} 种`);
+        q = `有 ${a} 件上衣、${b} 条裤子，各选一件共有几种搭配？`;
+        exp = `分步乘法原理：${a} × ${b} = ${a * b} 种。`;
+      } else if (type === 1) {
+        const k = rnd(2, 4);
+        const total = Math.pow(2, k);
+        o = opts(`${total} 种`, () => `${k} 种`, () => `${2 * k} 种`, () => `${k * k} 种`);
+        q = `一枚硬币连续抛 ${k} 次，所有可能的结果序列有几种？`;
+        exp = `每步 2 种，逐层翻倍共 2^${k} = ${total} 种（树状图逐层展开）。`;
+      } else if (type === 2) {
+        const k = rnd(2, 3);
+        o = opts(`1 − 1/2^${k}`, () => `1/2^${k}`, () => `1/2`, () => `1`);
+        q = `硬币抛 ${k} 次，至少出现 1 次正面的概率是？`;
+        exp = `全反面的概率为 1/2^${k}，故至少 1 次正面 = 1 − 1/2^${k}。`;
+      } else {
+        o = opts(`1/6`, () => `1/12`, () => `1/18`, () => `1/36`);
+        q = `同时掷两枚均匀骰子，点数之和为 7 的概率是？`;
+        exp = `36 种等可能，和为 7 有 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 共 6 种，6/36 = 1/6。`;
+      }
+      results.push(Q(q, o, "基础", exp, "树状图法", "tree_diagram"));
+    }
+    return results;
+  }
+
+  function qCounting(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const nn = rnd(4, 6);
+        const A = nn * (nn - 1);
+        o = opts(`${A}`, () => `${nn * (nn - 1) / 2}`, () => `${nn}`, () => `${nn - 1}`);
+        q = `从 ${nn} 人中选 2 人排成一列（有顺序），有几种排法？`;
+        exp = `排列数 A(${nn},2) = ${nn} × (${nn}−1) = ${A}。`;
+      } else if (type === 1) {
+        const nn = rnd(4, 6);
+        const C = nn * (nn - 1) / 2;
+        o = opts(`${C}`, () => `${nn * (nn - 1)}`, () => `${nn}`, () => `${nn - 1}`);
+        q = `从 ${nn} 人中选 2 人组成一个小组（无顺序），有几种选法？`;
+        exp = `组合数 C(${nn},2) = ${nn}(${nn}−1)/2 = ${C}。`;
+      } else if (type === 2) {
+        const nn = rnd(3, 4);
+        let f = 1; for (let j = 2; j <= nn; j++) f *= j;
+        o = opts(`${f}`, () => `${nn}`, () => `${nn * nn}`, () => `${Math.pow(2, nn)}`);
+        q = `${nn} 个人排成一排照相，有几种排法？`;
+        exp = `${nn} 个人的全排列 = ${nn}! = ${f}。`;
+      } else {
+        const nn = rnd(5, 8);
+        const C = nn * (nn - 1) / 2;
+        o = opts(`${C}`, () => `${nn}`, () => `${2 * nn}`, () => `${nn - 1}`);
+        q = `${nn} 个人两两握手一次，共握手几次？`;
+        exp = `每两人握一次，C(${nn},2) = ${nn}(${nn}−1)/2 = ${C} 次。`;
+      }
+      results.push(Q(q, o, "进阶", exp, "排列与组合", "counting_tree"));
+    }
+    return results;
+  }
+
+  function qCauchy(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("两向量共线（对应分量成比例）", () => "两向量垂直", () => "a = c", () => "任意情况");
+        q = "二维柯西不等式 (a²+b²)(c²+d²) ≥ (ac+bd)² 中等号成立的条件是？";
+        exp = "等号当且仅当向量 (a,b) 与 (c,d) 共线（对应分量成比例）。";
+      } else if (type === 1) {
+        o = opts(`1`, () => `2`, () => `√2`, () => `0`);
+        q = `已知 a²+b²=1 且 c²+d²=1，则 ac+bd 的最大值为？`;
+        exp = `柯西：(ac+bd)² ≤ (a²+b²)(c²+d²) = 1，故 ac+bd ≤ 1，最大值 1（两向量同向）。`;
+      } else if (type === 2) {
+        o = opts("柯西不等式", () => "均值不等式", () => "等差数列", () => "等比数列");
+        q = "证明 (x+y)² ≤ 2(x²+y²) 最直接可用？";
+        exp = "由柯西：(1²+1²)(x²+y²) ≥ (x+y)²，即 2(x²+y²) ≥ (x+y)²。";
+      } else {
+        o = opts("任意有限维都成立", () => "只二维", () => "只三维", () => "只一维");
+        q = "柯西不等式 (Σaᵢ²)(Σbᵢ²) ≥ (Σaᵢbᵢ)² 适用于？";
+        exp = "柯西不等式对任意有限维内积空间都成立。";
+      }
+      results.push(Q(q, o, "进阶", exp, "柯西不等式", "cauchy_rect"));
+    }
+    return results;
+  }
+
+  function qLinearProg(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const m = rnd(3, 6);
+        o = opts(`${m}`, () => `${2 * m}`, () => `${m / 2}`, () => `${m * m}`);
+        q = `约束 x≥0, y≥0, x+y≤${m}，目标 z=x+y 的最大值是？`;
+        exp = `在顶点 (${m},0) 或 (0,${m}) 处 z = ${m} 达到最大。`;
+      } else if (type === 1) {
+        const a = 2 * rnd(2, 4);
+        const zmax = 2 * a / 3;
+        o = opts(`${zmax}`, () => `${a}`, () => `${a / 3}`, () => `${2 * a}`);
+        q = `约束 x≥0, y≥0, 2x+y≤${a}, x+2y≤${a}，目标 z=x+y 的最大值是？`;
+        exp = `两约束交于 x=y=${a}/3，z = 2×${a}/3 = ${zmax}；比各坐标轴上的顶点更大。`;
+      } else if (type === 2) {
+        o = opts("凸多边形（凸集）", () => "任意形状", () => "圆形", () => "一条直线");
+        q = "线性规划中，由线性不等式围成的可行域是？";
+        exp = "线性约束的交集是凸集，有限情形为凸多边形。";
+      } else {
+        o = opts("可行域的顶点（角点）", () => "可行域内部", () => "坐标原点", () => "任意边界点");
+        q = "线性规划目标函数的最值一定在何处取得？";
+        exp = "由线性规划基本定理，最值在可行域的某个顶点取得。";
+      }
+      results.push(Q(q, o, "进阶", exp, "线性规划", "lprog_region"));
+    }
+    return results;
+  }
+
+  function qMatrix(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(1, 4), b = rnd(1, 4), c = rnd(1, 4), d = rnd(1, 4);
+        const det = a * d - b * c;
+        o = opts(`${det}`, () => `${a * d + b * c}`, () => `${a * b - c * d}`, () => `${a + d - b - c}`);
+        q = `二阶行列式 |${a} ${b}; ${c} ${d}| = ？`;
+        exp = `二阶行列式 = 主对角积 − 副对角积 = ${a}·${d} − ${b}·${c} = ${det}。`;
+      } else if (type === 1) {
+        o = opts("A 本身", () => "零矩阵", () => "单位矩阵 I", () => "A²");
+        q = "单位矩阵 I 与任意矩阵 A 满足 IA = ？";
+        exp = "单位矩阵是乘法单位元，IA = A。";
+      } else if (type === 2) {
+        const a = rnd(2, 5), d = rnd(2, 5);
+        o = opts(`${a * d}`, () => `${a + d}`, () => `0`, () => `1`);
+        q = `对角阵 |${a} 0; 0 ${d}| 的行列式 = ？`;
+        exp = `对角阵行列式 = 对角元乘积 = ${a} × ${d} = ${a * d}。`;
+      } else {
+        o = opts("不可逆（奇异）", () => "可逆", () => "对称", () => "对角");
+        q = "若二阶矩阵行列式为 0，则该矩阵？";
+        exp = "行列式为 0 ⇔ 矩阵不可逆（奇异矩阵）。";
+      }
+      results.push(Q(q, o, "进阶", exp, "矩阵与行列式", "matrix_det"));
+    }
+    return results;
+  }
+
+  function qLhopital(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts(`1`, () => `0`, () => `∞`, () => `−1`);
+        q = "极限 lim(x→0) sin x / x = ？（0/0 型，可用洛必达）";
+        exp = "洛必达：分子分母求导 → cos x / 1，x→0 得 1。";
+      } else if (type === 1) {
+        o = opts(`1`, () => `0`, () => `e`, () => `∞`);
+        q = "极限 lim(x→0) (e^x − 1) / x = ？";
+        exp = "洛必达：分子分母求导 → e^x / 1，x→0 得 1。";
+      } else if (type === 2) {
+        o = opts(`0`, () => `∞`, () => `1`, () => `1/2`);
+        q = "极限 lim(x→∞) (ln x) / x = ？（∞/∞ 型）";
+        exp = "洛必达：分子分母求导 → (1/x) / 1 = 1/x → 0（x→∞）。";
+      } else {
+        o = opts("0/0 或 ∞/∞ 型未定式", () => "0/∞ 型", () => "任意分式", () => "两数之积");
+        q = "洛必达法则直接适用的条件是？";
+        exp = "仅当极限为 0/0 或 ∞/∞ 未定式时才可直接用洛必达。";
+      }
+      results.push(Q(q, o, "进阶", exp, "洛必达法则", "lhopital_graph"));
+    }
+    return results;
+  }
+
+  function qMvt(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("(f(b) − f(a)) / (b − a)", () => "f(b) − f(a)", () => "f'(a)", () => "0");
+        q = "拉格朗日中值定理：若 f 在[a,b]连续、(a,b)可导，则 ∃ξ∈(a,b) 使 f'(ξ) = ？";
+        exp = "存在 ξ 使切线斜率等于割线斜率：f'(ξ) = (f(b)−f(a))/(b−a)。";
+      } else if (type === 1) {
+        o = opts(`1/2`, () => `1`, () => `0`, () => `2`);
+        q = "f(x)=x² 在 [0,1] 上，满足中值定理的 ξ = ？";
+        exp = "(1−0)/(1−0)=1，令 f'(ξ)=2ξ=1 → ξ=1/2。";
+      } else if (type === 2) {
+        o = opts("平行于弦（割线）", () => "垂直于 x 轴", () => "过原点", () => "平行于 y 轴");
+        q = "中值定理的几何意义：存在一点切线？";
+        exp = "存在 ξ 使该点切线与区间端点的连线（割线）平行。";
+      } else {
+        const nn = rnd(2, 4);
+        const xi = `${nn}/√3`;
+        o = opts(xi, () => `${nn}/3`, () => `√${nn}`, () => `${nn * nn}/3`);
+        q = `f(x)=x³ 在 [0,${nn}] 上，满足中值定理的 ξ = ？`;
+        exp = `(f(${nn})−f(0))/${nn} = ${nn}²，令 3ξ²=${nn}² → ξ=${nn}/√3。`;
+      }
+      results.push(Q(q, o, "进阶", exp, "中值定理", "mvt_tangent"));
+    }
+    return results;
+  }
+
+  function qBayes(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const p1 = (rnd(3, 6)) / 10, p2 = (rnd(4, 8)) / 10;
+        const prod = p1 * p2;
+        o = opts(`${prod}`, () => `${p2}`, () => `${p1}`, () => `${p1 + p2}`);
+        q = `已知 P(A)=${p1}，P(B|A)=${p2}，则 P(A∩B) = ？`;
+        exp = `乘法公式：P(A∩B) = P(A)·P(B|A) = ${p1} × ${p2} = ${prod}。`;
+      } else if (type === 1) {
+        o = opts("P(A) + P(B)", () => "P(A)·P(B)", () => "0", () => "1");
+        q = "若 A、B 互斥，则 P(A∪B) = ？";
+        exp = "互斥事件无交集，P(A∪B) = P(A) + P(B)。";
+      } else if (type === 2) {
+        o = opts("由结果反推原因（逆概率）", () => "求独立", () => "求期望", () => "求方差");
+        q = "贝叶斯公式主要用于解决哪类问题？";
+        exp = "贝叶斯公式由已观察到的“结果”反推各“原因”的概率，即逆概率。";
+      } else {
+        o = opts("P(A)P(B|A) / P(B)", () => "P(A)/P(B)", () => "P(B|A)/P(A)", () => "P(A)+P(B)");
+        q = "条件概率 P(A|B) 的计算公式是？";
+        exp = "定义：P(A|B) = P(A∩B)/P(B) = P(A)P(B|A)/P(B)（乘法公式）。";
+      }
+      results.push(Q(q, o, "进阶", exp, "条件概率与贝叶斯", "bayes_tree"));
+    }
+    return results;
+  }
+
+  /* ============================================================
    * 注册到 window.TECHNIQUES
    * ============================================================ */
   const GEN = {
@@ -1164,6 +1406,14 @@
     binomial: qBinomial,
     inclusion_hs: qInclusion,
     recurrence: qRecurrence,
+    tree: qTree,
+    counting: qCounting,
+    cauchy: qCauchy,
+    linearprog: qLinearProg,
+    matrix: qMatrix,
+    lhopital: qLhopital,
+    mvt: qMvt,
+    bayes: qBayes,
     set: qSet,
     funcconcept: qFuncConcept,
     explog: qExpLog,

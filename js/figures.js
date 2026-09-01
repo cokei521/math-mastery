@@ -1053,7 +1053,16 @@
     "amgm::0": "amgm_rect", "amgm::1": "amgm_rect", "amgm::2": "amgm_rect", "amgm::3": "amgm_rect",
     "binomial::0": "binomial_triangle", "binomial::1": "binomial_triangle", "binomial::2": "binomial_triangle", "binomial::3": "binomial_triangle",
     "inclusion_hs::0": "inclusion_venn", "inclusion_hs::1": "inclusion_venn", "inclusion_hs::2": "inclusion_venn", "inclusion_hs::3": "inclusion_venn",
-    "recurrence::0": "recurrence_tree", "recurrence::1": "recurrence_tree", "recurrence::2": "recurrence_tree", "recurrence::3": "recurrence_tree"
+    "recurrence::0": "recurrence_tree", "recurrence::1": "recurrence_tree", "recurrence::2": "recurrence_tree", "recurrence::3": "recurrence_tree",
+    /* 第二批拓展：树状图/排列组合/柯西/线性规划/矩阵/洛必达/中值定理/贝叶斯 */
+    "tree::0": "tree_diagram", "tree::1": "tree_diagram", "tree::2": "tree_diagram", "tree::3": "tree_diagram",
+    "counting::0": "counting_tree", "counting::1": "counting_tree", "counting::2": "counting_tree", "counting::3": "counting_tree",
+    "cauchy::0": "cauchy_rect", "cauchy::1": "cauchy_rect", "cauchy::2": "cauchy_rect", "cauchy::3": "cauchy_rect",
+    "linearprog::0": "lprog_region", "linearprog::1": "lprog_region", "linearprog::2": "lprog_region", "linearprog::3": "lprog_region",
+    "matrix::0": "matrix_det", "matrix::1": "matrix_det", "matrix::2": "matrix_det", "matrix::3": "matrix_det",
+    "lhopital::0": "lhopital_graph", "lhopital::1": "lhopital_graph", "lhopital::2": "lhopital_graph", "lhopital::3": "lhopital_graph",
+    "mvt::0": "mvt_tangent", "mvt::1": "mvt_tangent", "mvt::2": "mvt_tangent", "mvt::3": "mvt_tangent",
+    "bayes::0": "bayes_tree", "bayes::1": "bayes_tree", "bayes::2": "bayes_tree", "bayes::3": "bayes_tree"
   };
 
 
@@ -1165,6 +1174,95 @@
     s += `<line x1="156" y1="110" x2="214" y2="110" stroke="${K.line}"/><line x1="156" y1="190" x2="214" y2="190" stroke="${K.line}"/>`;
     s += `<text x="40" y="42" fill="${K.sub}" font-size="12">递推：aₙ₊₁ = f(aₙ)</text>`;
     return S(300, 260, s);
+  };
+
+  /* ---------------- 第二批拓展配图 ---------------- */
+  Fig.tree_diagram = function () {
+    let s = `<text x="20" y="28" fill="${K.sub}" font-size="12">树状图：逐层分支</text>`;
+    s += `<circle cx="40" cy="80" r="14" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<line x1="54" y1="80" x2="110" y2="50" stroke="${K.line}"/><line x1="54" y1="80" x2="110" y2="110" stroke="${K.line}"/>`;
+    s += `<circle cx="130" cy="50" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="121" y="54" font-size="11" fill="${K.ink}">A</text>`;
+    s += `<circle cx="130" cy="110" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="121" y="114" font-size="11" fill="${K.ink}">B</text>`;
+    s += `<line x1="143" y1="50" x2="200" y2="35" stroke="${K.line}"/><line x1="143" y1="50" x2="200" y2="65" stroke="${K.line}"/>`;
+    s += `<line x1="143" y1="110" x2="200" y2="95" stroke="${K.line}"/><line x1="143" y1="110" x2="200" y2="125" stroke="${K.line}"/>`;
+    s += `<circle cx="215" cy="35" r="11" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.5"/><circle cx="215" cy="65" r="11" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.5"/>`;
+    s += `<circle cx="215" cy="95" r="11" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.5"/><circle cx="215" cy="125" r="11" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.5"/>`;
+    s += `<text x="118" y="152" fill="${K.sub}" font-size="11">分支数相乘：2 × 2 = 4 种结果</text>`;
+    return S(300, 170, s);
+  };
+  Fig.counting_tree = function () {
+    let s = `<text x="20" y="26" fill="${K.sub}" font-size="12">排列 A(n,2)：有顺序</text>`;
+    s += `<circle cx="40" cy="80" r="14" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<line x1="54" y1="80" x2="120" y2="55" stroke="${K.line}"/><line x1="54" y1="80" x2="120" y2="105" stroke="${K.line}"/>`;
+    s += `<circle cx="135" cy="55" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="127" y="59" font-size="11" fill="${K.ink}">①</text>`;
+    s += `<circle cx="135" cy="105" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="127" y="109" font-size="11" fill="${K.ink}">②</text>`;
+    s += `<line x1="148" y1="55" x2="210" y2="40" stroke="${K.line}"/><line x1="148" y1="55" x2="210" y2="70" stroke="${K.line}"/>`;
+    s += `<line x1="148" y1="105" x2="210" y2="90" stroke="${K.line}"/><line x1="148" y1="105" x2="210" y2="120" stroke="${K.line}"/>`;
+    s += `<text x="216" y="44" font-size="11" fill="${K.ink}">①②</text><text x="216" y="74" font-size="11" fill="${K.ink}">②①</text>`;
+    s += `<text x="216" y="94" font-size="11" fill="${K.ink}">②①</text><text x="216" y="124" font-size="11" fill="${K.ink}">①②</text>`;
+    s += `<text x="64" y="152" fill="${K.sub}" font-size="11">顺序不同算不同：A(2,2)=2</text>`;
+    return S(300, 170, s);
+  };
+  Fig.cauchy_rect = function () {
+    let s = `<text x="20" y="26" fill="${K.sub}" font-size="12">柯西：|u·v| ≤ |u||v|</text>`;
+    s += `<line x1="60" y1="150" x2="60" y2="40" stroke="${K.line}"/><line x1="40" y1="150" x2="210" y2="150" stroke="${K.line}"/>`;
+    s += `<line x1="60" y1="150" x2="160" y2="80" stroke="${K.pri}" stroke-width="3"/>`;
+    s += `<line x1="60" y1="150" x2="140" y2="120" stroke="${K.ok}" stroke-width="3"/>`;
+    s += `<text x="112" y="72" font-size="12" fill="${K.ink}">u</text><text x="100" y="135" font-size="12" fill="${K.ink}">v</text>`;
+    s += `<path d="M60 150 L160 80 L205 80 L105 150 Z" fill="${K.soft}" opacity="0.5"/>`;
+    s += `<text x="96" y="178" fill="${K.sub}" font-size="11">夹角越小投影越大 → 等号在共线</text>`;
+    return S(300, 195, s);
+  };
+  Fig.lprog_region = function () {
+    let s = `<text x="16" y="24" fill="${K.sub}" font-size="12">可行域（阴影）+ 目标线</text>`;
+    s += `<polygon points="50,160 50,90 150,50 200,90 200,160" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<line x1="60" y1="170" x2="210" y2="40" stroke="${K.warn}" stroke-width="2" stroke-dasharray="5 4"/>`;
+    s += `<circle cx="50" cy="160" r="4" fill="${K.red}"/><circle cx="50" cy="90" r="4" fill="${K.red}"/><circle cx="150" cy="50" r="4" fill="${K.red}"/><circle cx="200" cy="90" r="4" fill="${K.red}"/><circle cx="200" cy="160" r="4" fill="${K.red}"/>`;
+    s += `<text x="150" y="44" font-size="11" fill="${K.ink}">顶点取最值</text>`;
+    s += `<text x="78" y="188" fill="${K.sub}" font-size="11">目标线平移，截距最大处即最优</text>`;
+    return S(300, 200, s);
+  };
+  Fig.matrix_det = function () {
+    let s = `<text x="56" y="26" fill="${K.sub}" font-size="12">|a b; c d| = ad − bc</text>`;
+    s += `<rect x="80" y="55" width="100" height="90" fill="none" stroke="${K.ink}" stroke-width="2"/>`;
+    s += `<text x="98" y="100" font-size="24" fill="${K.pri}">a</text><text x="150" y="100" font-size="24" fill="${K.pri}">b</text>`;
+    s += `<text x="98" y="135" font-size="24" fill="${K.ok}">c</text><text x="150" y="135" font-size="24" fill="${K.ok}">d</text>`;
+    s += `<line x1="88" y1="63" x2="172" y2="127" stroke="${K.red}" stroke-width="2"/>`;
+    s += `<line x1="172" y1="63" x2="88" y2="127" stroke="${K.warn}" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<text x="62" y="178" fill="${K.sub}" font-size="11">主对角积 − 副对角积</text>`;
+    return S(300, 195, s);
+  };
+  Fig.lhopital_graph = function () {
+    let s = `<text x="20" y="24" fill="${K.sub}" font-size="12">lim sinx/x = 1（x→0）</text>`;
+    s += `<line x1="50" y1="150" x2="260" y2="150" stroke="${K.line}"/><line x1="155" y1="30" x2="155" y2="170" stroke="${K.line}"/>`;
+    s += `<path d="M60 118 Q155 150 250 118" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="60" y1="150" x2="250" y2="150" stroke="${K.warn}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    s += `<circle cx="155" cy="150" r="5" fill="${K.red}"/>`;
+    s += `<text x="160" y="44" font-size="11" fill="${K.ink}">曲线趋于 1</text>`;
+    return S(300, 180, s);
+  };
+  Fig.mvt_tangent = function () {
+    let s = `<text x="20" y="24" fill="${K.sub}" font-size="12">切线 ∥ 弦（中值定理）</text>`;
+    s += `<path d="M50 150 Q150 60 260 150" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="70" y1="135" x2="240" y2="135" stroke="${K.warn}" stroke-width="2"/>`;
+    s += `<line x1="120" y1="105" x2="190" y2="105" stroke="${K.ok}" stroke-width="2"/>`;
+    s += `<circle cx="95" cy="120" r="4" fill="${K.red}"/><circle cx="215" cy="120" r="4" fill="${K.red}"/>`;
+    s += `<text x="78" y="172" font-size="11" fill="${K.ink}">端点连线(弦)</text>`;
+    s += `<text x="92" y="186" fill="${K.sub}" font-size="11">中间存在切线与之平行</text>`;
+    return S(300, 195, s);
+  };
+  Fig.bayes_tree = function () {
+    let s = `<text x="20" y="24" fill="${K.sub}" font-size="12">贝叶斯：由果溯因（逆概率）</text>`;
+    s += `<circle cx="40" cy="100" r="14" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<line x1="54" y1="100" x2="120" y2="70" stroke="${K.line}"/><line x1="54" y1="100" x2="120" y2="130" stroke="${K.line}"/>`;
+    s += `<circle cx="135" cy="70" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="123" y="74" font-size="11" fill="${K.ink}">因A</text>`;
+    s += `<circle cx="135" cy="130" r="13" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="123" y="134" font-size="11" fill="${K.ink}">因B</text>`;
+    s += `<line x1="148" y1="70" x2="220" y2="55" stroke="${K.line}"/><line x1="148" y1="70" x2="220" y2="85" stroke="${K.line}"/>`;
+    s += `<line x1="148" y1="130" x2="220" y2="115" stroke="${K.line}"/><line x1="148" y1="130" x2="220" y2="145" stroke="${K.line}"/>`;
+    s += `<circle cx="235" cy="55" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/><circle cx="235" cy="85" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/>`;
+    s += `<circle cx="235" cy="115" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/><circle cx="235" cy="145" r="10" fill="${K.soft}" stroke="${K.warn}" stroke-width="1.3"/>`;
+    s += `<text x="96" y="172" fill="${K.sub}" font-size="11">观测“结果”后，反推各原因概率</text>`;
+    return S(300, 185, s);
   };
 
   window.Fig = Fig;
