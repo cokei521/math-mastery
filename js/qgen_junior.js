@@ -120,10 +120,10 @@
         exp = `去括号：x + ${b} = ${c} ÷ ${a} = ${c / a}，x = ${c / a} − ${b} = ${x}。`;
       } else if (type === 2) {
         // 应用题（年龄问题）
-        const age = rnd(10, 20);
-        const fatherAge = age * rnd(2, 3);
-        const years = rnd(5, 10);
-        o = opts(years, () => years + 2, () => years - 2, () => rnd(1, 15));
+        const age = rnd(8, 15);
+        const years = rnd(5, 15);
+        const fatherAge = 2 * age + years; // 保证 fatherAge > 2*age，x = years 为正解
+        o = opts(years, () => years + 2, () => years - 2, () => years + 5);
         q = `儿子 ${age} 岁，父亲 ${fatherAge} 岁，几年后父亲年龄是儿子的 2 倍？`;
         exp = `设 x 年后：${fatherAge} + x = 2(${age} + x)，解得 x = ${years}。`;
       } else {
