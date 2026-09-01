@@ -1745,4 +1745,174 @@ window.TECHNIQUES = [
         explain: "R²→1 拟合优度越高。", point: "拟合" }
     ]
   },
+
+  /* ===================== 拓展专题（高中 / 大学先修） ===================== */
+  {
+    id: "euler", grade: "十二年级+", stage: "高中", name: "欧拉公式", anim: "euler",
+    summary: "e^(iθ)=cosθ+i·sinθ 把指数、复数、三角统一；e^(iπ)+1=0 被誉为最美公式。",
+    kou: "e 的 iθ 次：实部是 cos，虚部是 sin；令 θ=π，加一归零。",
+    steps: [
+      "欧拉公式：<b>e^(iθ) = cosθ + i·sinθ</b>。",
+      "令 θ=π：<b>e^(iπ) + 1 = 0</b>（连接 0、1、e、i、π）。",
+      "模长恒为 1：|e^(iθ)| = √(cos²θ+sin²θ) = 1，对应单位圆。"
+    ],
+    prereq: "complex",
+    questions: [
+      { q: "欧拉公式 e^(iθ) 等于？", opts: ["cosθ + i·sinθ","cosθ − i·sinθ","sinθ + i·cosθ","e^θ"], ans: 0, level: "基础",
+        explain: "e^(iθ) = cosθ + i·sinθ。", point: "欧拉公式" },
+      { q: "e^(iπ) 的值是？", opts: ["−1","1","i","0"], ans: 0, level: "基础",
+        explain: "e^(iπ) = −1，故 e^(iπ)+1=0。", point: "欧拉恒等式" },
+      { q: "e^(iπ/2) 的值是？", opts: ["i","−i","1","−1"], ans: 0, level: "基础",
+        explain: "cos(π/2)+i·sin(π/2)=i。", point: "特殊角" },
+      { q: "|e^(iθ)| 等于？", opts: ["1","|cosθ|","θ","e^θ"], ans: 0, level: "基础",
+        explain: "单位圆上，模长恒为 1。", point: "模长" }
+    ]
+  },
+  {
+    id: "taylor", grade: "十二年级+", stage: "高中", name: "泰勒级数", anim: "taylor",
+    summary: "用多项式逼近函数：e^x、sin x、cos x、ln(1+x) 均可展开成幂级数。",
+    kou: "函数在一点展开成多项式：导数定系数，阶乘作分母，越往后越贴合。",
+    steps: [
+      "<b>麦克劳林</b>（在 0 处展开）：f(x) = f(0) + f'(0)x + f''(0)x²/2! + …",
+      "e^x = 1 + x + x²/2! + x³/3! + …；sin x = x − x³/3! + x⁵/5! − …",
+      "cos x = 1 − x²/2! + x⁴/4! − …；ln(1+x) = x − x²/2 + x³/3 − …"
+    ],
+    prereq: "derivative",
+    questions: [
+      { q: "e^x 展开中 x⁴ 项系数？", opts: ["1/24","1/6","1/12","1/2"], ans: 0, level: "进阶",
+        explain: "1/4! = 1/24。", point: "e^x 展开" },
+      { q: "sin x 展开中 x² 项系数？", opts: ["0","1","−1","1/2"], ans: 0, level: "进阶",
+        explain: "只含奇次幂，x² 系数为 0。", point: "sin x 展开" },
+      { q: "cos x 展开中 x² 项系数？", opts: ["−1/2","1/2","−1","1"], ans: 0, level: "进阶",
+        explain: "1 − x²/2 + …，系数 −1/2。", point: "cos x 展开" },
+      { q: "ln(1+x) 展开中 x 项系数？", opts: ["1","−1","1/2","0"], ans: 0, level: "进阶",
+        explain: "x − x²/2 + …，系数 1。", point: "ln 展开" }
+    ]
+  },
+  {
+    id: "numshape", grade: "十一年级", stage: "高中", name: "数形结合", anim: "numshape",
+    summary: "代数问题用图形辅助，几何问题用坐标量化，是贯穿中学的核心思想方法。",
+    kou: "式子想图，图里读数；坐标代点，象限定位；绝对值即距离。",
+    steps: [
+      "<b>以形助数</b>：方程、不等式用函数图像直观求解。",
+      "<b>以数助形</b>：几何位置用坐标与代数式精确刻画。",
+      "|x−a| 表示数轴上两点距离；点 (x,y) 由坐标定象限。"
+    ],
+    prereq: "funcconcept",
+    questions: [
+      { q: "|x−3| 的几何意义？", opts: ["到 3 的距离","到原点距离","到 0 距离","到 x 距离"], ans: 0, level: "基础",
+        explain: "|x−a| 表示 x 到 a 的距离。", point: "绝对值几何意义" },
+      { q: "解 x²−1>0（数形结合）？", opts: ["x<−1 或 x>1","−1<x<1","x>1","x<−1"], ans: 0, level: "基础",
+        explain: "抛物线在 x 轴上方即 x²>1。", point: "图像解不等式" },
+      { q: "f(x)=x²−2x−3 的零点？", opts: ["−1 和 3","1 和 3","−1 和 −3","1 和 −3"], ans: 0, level: "基础",
+        explain: "(x−3)(x+1)=0 → x=3,−1。", point: "函数零点" },
+      { q: "点 (−2,3) 在第几象限？", opts: ["第二象限","第一象限","第三象限","第四象限"], ans: 0, level: "基础",
+        explain: "x<0,y>0 → 第二象限。", point: "象限" }
+    ]
+  },
+  {
+    id: "induction", grade: "十二年级", stage: "高中", name: "数学归纳法", anim: null,
+    summary: "证明与自然数 n 有关的命题：奠基 + 递推，两步缺一不可。",
+    kou: "一验初值立得住，二设 k 真推 k+1；两步闭环，命题全成立。",
+    steps: [
+      "<b>第一步（奠基）</b>：验证 n 取初值（如 n=1）时命题成立。",
+      "<b>第二步（递推）</b>：假设 n=k 成立，推出 n=k+1 也成立。",
+      "两步齐备，则对所有 n≥初值命题成立。"
+    ],
+    prereq: "sequence",
+    questions: [
+      { q: "归纳法第一步要做？", opts: ["验证初值成立","令 n→∞","证明 n=k+1","写结论"], ans: 0, level: "基础",
+        explain: "先验证起始值成立。", point: "奠基" },
+      { q: "归纳法第二步要证？", opts: ["由 k 推 k+1","由 1 推 2","证明 k 成立","令 n→∞"], ans: 0, level: "基础",
+        explain: "假设 k 真，推出 k+1 真。", point: "递推" },
+      { q: "1+2+…+100 = ？", opts: ["5050","5000","10100","100"], ans: 0, level: "基础",
+        explain: "100×101/2 = 5050。", point: "求和公式" },
+      { q: "2⁰+2¹+2² = ？", opts: ["7","8","6","15"], ans: 0, level: "基础",
+        explain: "1+2+4 = 7 = 2³−1。", point: "等比和" }
+    ]
+  },
+  {
+    id: "amgm", grade: "十一年级", stage: "高中", name: "均值不等式", anim: null,
+    summary: "对正数 a,b：a+b ≥ 2√(ab)；求最值、证不等式的利器。",
+    kou: "两数和不小于两倍根号积；一正二定三相等，最值才到手。",
+    steps: [
+      "<b>二元</b>：a,b>0 时 a+b ≥ 2√(ab)，当且仅当 a=b 取等。",
+      "<b>三元</b>：a+b+c ≥ 3·³√(abc)，当且仅当 a=b=c 取等。",
+      "应用“一正二定三相等”：正数、和或积为定值、等号可取。"
+    ],
+    prereq: "funcconcept",
+    questions: [
+      { q: "正数 a,b 的基本均值不等式？", opts: ["a+b ≥ 2√(ab)","a+b ≤ 2√(ab)","a+b = 2√(ab)","无确定关系"], ans: 0, level: "进阶",
+        explain: "a+b ≥ 2√(ab)，a=b 取等。", point: "基本式" },
+      { q: "x>0 时 x+4/x 最小值？", opts: ["4","2","8","√4"], ans: 0, level: "进阶",
+        explain: "≥2√(x·4/x)=4，x=2 取等。", point: "求最值" },
+      { q: "a+b+c≥3·³√(abc) 等号条件？", opts: ["a=b=c","a+b+c=0","任意","a=0"], ans: 0, level: "进阶",
+        explain: "当且仅当三数相等。", point: "等号条件" },
+      { q: "x>0 时 x+1/x 最小值？", opts: ["2","1","0","√2"], ans: 0, level: "进阶",
+        explain: "≥2，x=1 取等。", point: "求最值" }
+    ]
+  },
+  {
+    id: "binomial", grade: "十二年级", stage: "高中", name: "二项式定理", anim: null,
+    summary: "(a+b)^n 展开成组合系数多项式，通项、系数、赋值法是三大考点。",
+    kou: "展开共 n+1 项，系数组合数 C(n,k)；令 a=b=1，系数和 2ⁿ。",
+    steps: [
+      "<b>展开</b>：(a+b)^n = Σ C(n,k) a^{n−k} b^k，共 n+1 项。",
+      "<b>通项</b>：第 k+1 项为 T_{k+1} = C(n,k) a^{n−k} b^k。",
+      "<b>系数和</b>：令 a=b=1，得各项二项式系数和 = 2ⁿ。"
+    ],
+    prereq: "sequence",
+    questions: [
+      { q: "(a+b)^n 共有几项？", opts: ["n+1","n","2n","n−1"], ans: 0, level: "进阶",
+        explain: "从 aⁿ 到 bⁿ 共 n+1 项。", point: "项数" },
+      { q: "(a+b)³ 中 a²b 系数？", opts: ["3","1","6","2"], ans: 0, level: "进阶",
+        explain: "C(3,1)=3。", point: "系数" },
+      { q: "(1+x)^4 中 x² 系数？", opts: ["6","4","1","24"], ans: 0, level: "进阶",
+        explain: "C(4,2)=6。", point: "系数" },
+      { q: "(a+b)^n 各项二项式系数和？", opts: ["2ⁿ","n","n+1","2n"], ans: 0, level: "进阶",
+        explain: "令 a=b=1 得 2ⁿ。", point: "系数和" }
+    ]
+  },
+  {
+    id: "inclusion_hs", grade: "十一年级", stage: "高中", name: "容斥原理", anim: null,
+    summary: "计数时避免重复：|A∪B|=|A|+|B|−|A∩B|，三集合再加回三者交。",
+    kou: "加了又减交，三集加回三者交；计数不重也不漏。",
+    steps: [
+      "<b>两集合</b>：|A∪B| = |A| + |B| − |A∩B|。",
+      "<b>三集合</b>：再减去两两交和，加回三者交集 |A∩B∩C|。",
+      "应用：分类计数、整除个数、概率并集。"
+    ],
+    prereq: "set",
+    questions: [
+      { q: "20 人会英、15 人会日，都会 5 人，至少会一种？", opts: ["30","35","25","5"], ans: 0, level: "进阶",
+        explain: "20+15−5=30。", point: "两集容斥" },
+      { q: "两集合 |A∪B| = ？", opts: ["|A|+|B|−|A∩B|","|A|+|B|","|A|·|B|","|A∩B|"], ans: 0, level: "进阶",
+        explain: "减去重复计数的交集。", point: "公式" },
+      { q: "三集合再加回？", opts: ["|A∩B∩C|","0","−|A∩B∩C|","三者积"], ans: 0, level: "进阶",
+        explain: "加回被多减一次的三者交。", point: "三集合" },
+      { q: "1~100 中能被 2 或 3 整除的数？", opts: ["67","50","33","83"], ans: 0, level: "进阶",
+        explain: "50+33−16=67。", point: "整除计数" }
+    ]
+  },
+  {
+    id: "recurrence", grade: "十一年级", stage: "高中", name: "递推数列求通项", anim: null,
+    summary: "由 a_{n+1}=f(a_n) 求 a_n：等比型、等差型、构造辅助数列是三种通法。",
+    kou: "一阶递推看类型：等比直接乘，等差直接加，p·a_n+q 凑等比。",
+    steps: [
+      "<b>等比型</b>：a_{n+1}=q·a_n → a_n = a₁·q^{n−1}。",
+      "<b>等差型</b>：a_{n+1}=a_n+d → a_n = a₁+(n−1)d。",
+      "<b>p·a_n+q 型</b>：构造 {a_n+c} 成等比，或逐项迭代。"
+    ],
+    prereq: "sequence",
+    questions: [
+      { q: "a₁=1, a_{n+1}=2a_n，则 a₅=？", opts: ["16","8","32","2"], ans: 0, level: "进阶",
+        explain: "a_n=2^{n−1}，a₅=16。", point: "等比型" },
+      { q: "a₁=2, a_{n+1}=a_n+3，则 a₆=？", opts: ["17","15","20","18"], ans: 0, level: "进阶",
+        explain: "a₆=2+3×5=17。", point: "等差型" },
+      { q: "a₁=1, a_{n+1}=2a_n+1，则 a₄=？", opts: ["15","7","16","31"], ans: 0, level: "进阶",
+        explain: "1→3→7→15。", point: "构造等比" },
+      { q: "1,3,9,27,… 通项？", opts: ["3^{n−1}","3ⁿ","n³","3n"], ans: 0, level: "进阶",
+        explain: "首项1、公比3的等比数列。", point: "识别" }
+    ]
+  }
 ];

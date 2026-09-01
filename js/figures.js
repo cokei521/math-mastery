@@ -1044,9 +1044,128 @@
     "dist_binom::1": { name: "barChart", data: [{ l: "0", v: 1, c: K.pri }, { l: "1", v: 4, c: K.ok }, { l: "2", v: 6, c: K.warn }, { l: "3", v: 4, c: K.Orange }, { l: "4", v: 1, c: K.purple }] },
     "dist_binom::2": "normalCurve", "dist_binom::3": "normalCurve",
     /* 统计案例（仅相关图配） */
-    "stat_case::2": "scatter"
+    "stat_case::2": "scatter",
+    /* 拓展专题 */
+    "euler::0": "euler_circle", "euler::1": "euler_circle", "euler::2": "euler_circle", "euler::3": "euler_circle",
+    "taylor::0": "taylor_graph", "taylor::1": "taylor_graph", "taylor::2": "taylor_graph", "taylor::3": "taylor_graph",
+    "numshape::0": "numshape_coord", "numshape::1": "numshape_coord", "numshape::2": "numshape_coord", "numshape::3": "numshape_coord",
+    "induction::0": "induction_steps", "induction::1": "induction_steps", "induction::2": "induction_steps", "induction::3": "induction_steps",
+    "amgm::0": "amgm_rect", "amgm::1": "amgm_rect", "amgm::2": "amgm_rect", "amgm::3": "amgm_rect",
+    "binomial::0": "binomial_triangle", "binomial::1": "binomial_triangle", "binomial::2": "binomial_triangle", "binomial::3": "binomial_triangle",
+    "inclusion_hs::0": "inclusion_venn", "inclusion_hs::1": "inclusion_venn", "inclusion_hs::2": "inclusion_venn", "inclusion_hs::3": "inclusion_venn",
+    "recurrence::0": "recurrence_tree", "recurrence::1": "recurrence_tree", "recurrence::2": "recurrence_tree", "recurrence::3": "recurrence_tree"
   };
 
+
+  /* ---------------- 拓展专题配图 ---------------- */
+  Fig.euler_circle = function () {
+    const cx = 150, cy = 150, R = 110;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="280" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${K.pri}" stroke-width="2"/>`;
+    const ang = Math.PI / 3;
+    const x = cx + R * Math.cos(ang), y = cy - R * Math.sin(ang);
+    s += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${K.warn}" stroke-width="3"/>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${cy}" stroke="${K.red}" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<line x1="${x}" y1="${cy}" x2="${x}" y2="${y}" stroke="${K.green}" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<circle cx="${x}" cy="${y}" r="5" fill="${K.warn}"/>`;
+    s += `<text x="${x + 8}" y="${y - 8}" fill="${K.ink}" font-size="13">e^(iθ)</text>`;
+    s += `<text x="${cx + R / 2 - 10}" y="${cy + 20}" fill="${K.red}" font-size="12">cosθ</text>`;
+    s += `<text x="${x + 8}" y="${cy - 4}" fill="${K.green}" font-size="12">sinθ</text>`;
+    s += `<text x="24" y="22" fill="${K.sub}" font-size="12">欧拉公式 e^(iθ)=cosθ+i·sinθ</text>`;
+    return S(300, 300, s);
+  };
+
+  Fig.taylor_graph = function () {
+    const W = 320, H = 220, cx = 40, cy = 180;
+    const X = v => cx + v * 28;
+    const Y = v => { let w = v; if (w > 9) w = 9; return cy - w * 16; };
+    let s = `<line x1="${cx}" y1="10" x2="${cx}" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="312" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    function curve(fn, color, w) {
+      let pts = [];
+      for (let i = -1; i <= 2.8001; i += 0.1) { let v = fn(i); if (v > 9) v = 9; pts.push([X(i), Y(v)]); }
+      s += `<polyline points="${pts.map(p => p[0] + "," + p[1]).join(" ")}" fill="none" stroke="${color}" stroke-width="${w}"/>`;
+    }
+    curve(Math.exp, K.pri, 2.5);
+    curve(x => 1 + x + x * x / 2 + x * x * x / 6, K.warn, 2.5);
+    s += `<text x="20" y="22" fill="${K.sub}" font-size="12">蓝：e^x　橙：1+x+x²/2+x³/6</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.numshape_coord = function () {
+    const W = 300, H = 300, cx = 150, cy = 150;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="280" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<rect x="20" y="20" width="${cx - 20}" height="${cy - 20}" fill="${K.soft}"/>`;
+    s += `<text x="40" y="42" fill="${K.pri}" font-size="13">第二象限</text>`;
+    s += `<text x="${cx + 8}" y="42" fill="${K.sub}" font-size="13">第一象限</text>`;
+    s += `<text x="40" y="272" fill="${K.sub}" font-size="13">第三象限</text>`;
+    s += `<text x="${cx + 8}" y="272" fill="${K.sub}" font-size="13">第四象限</text>`;
+    const px = cx - 50, py = cy - 60;
+    s += `<circle cx="${px}" cy="${py}" r="5" fill="${K.warn}"/>`;
+    s += `<text x="${px + 8}" y="${py - 8}" fill="${K.ink}" font-size="13">(−2, 3)</text>`;
+    return S(W, H, s);
+  };
+
+  Fig.induction_steps = function () {
+    let s = `<rect x="20" y="30" width="250" height="44" rx="8" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<text x="40" y="58" fill="${K.ink}" font-size="14">① 奠基：验证 n=1 成立</text>`;
+    s += `<text x="150" y="108" fill="${K.sub}" font-size="20" text-anchor="middle">↓</text>`;
+    s += `<rect x="20" y="120" width="250" height="44" rx="8" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/>`;
+    s += `<text x="40" y="148" fill="${K.ink}" font-size="14">② 假设 n=k 成立</text>`;
+    s += `<text x="150" y="198" fill="${K.sub}" font-size="20" text-anchor="middle">↓</text>`;
+    s += `<rect x="20" y="210" width="250" height="44" rx="8" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/>`;
+    s += `<text x="40" y="238" fill="${K.ink}" font-size="14">③ 推出 n=k+1 成立</text>`;
+    return S(290, 270, s);
+  };
+
+  Fig.amgm_rect = function () {
+    let s = `<rect x="40" y="80" width="120" height="80" fill="${K.soft}" stroke="${K.pri}" stroke-width="2"/>`;
+    s += `<text x="92" y="70" fill="${K.ink}" font-size="14">a</text>`;
+    s += `<text x="152" y="128" fill="${K.ink}" font-size="14">b</text>`;
+    s += `<line x1="40" y1="165" x2="280" y2="165" stroke="${K.ink}" stroke-width="1.5"/>`;
+    s += `<rect x="40" y="165" width="200" height="14" fill="${K.warn}" opacity="0.45"/>`;
+    s += `<text x="40" y="205" fill="${K.ink}" font-size="14">a + b ≥ 2√(ab)</text>`;
+    s += `<text x="40" y="40" fill="${K.sub}" font-size="13">周长固定时，正方形面积最大</text>`;
+    return S(300, 220, s);
+  };
+
+  Fig.binomial_triangle = function () {
+    const rows = [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]];
+    let s = "";
+    const y0 = 36, dx = 34, dy = 34;
+    rows.forEach((r, i) => {
+      const startX = 150 - (r.length - 1) * dx / 2;
+      r.forEach((v, j) => {
+        const x = startX + j * dx, y = y0 + i * dy;
+        s += `<text x="${x - 6}" y="${y + 5}" fill="${K.ink}" font-size="13" text-anchor="middle">${v}</text>`;
+      });
+    });
+    s += `<text x="55" y="224" fill="${K.sub}" font-size="12">(a+b)^4 系数：1 4 6 4 1</text>`;
+    return S(300, 240, s);
+  };
+
+  Fig.inclusion_venn = function () {
+    let s = `<circle cx="110" cy="150" r="70" fill="${K.soft}" stroke="${K.pri}" stroke-width="2"/>`;
+    s += `<circle cx="190" cy="150" r="70" fill="${K.soft}" stroke="${K.warn}" stroke-width="2"/>`;
+    s += `<text x="78" y="156" fill="${K.ink}" font-size="14">A</text>`;
+    s += `<text x="200" y="156" fill="${K.ink}" font-size="14">B</text>`;
+    s += `<text x="40" y="42" fill="${K.sub}" font-size="13">|A∪B| = |A|+|B|−|A∩B|</text>`;
+    return S(300, 300, s);
+  };
+
+  Fig.recurrence_tree = function () {
+    let s = `<circle cx="50" cy="150" r="16" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/><text x="42" y="155" font-size="13" fill="${K.ink}" text-anchor="middle">a₁</text>`;
+    s += `<circle cx="140" cy="110" r="16" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/><text x="132" y="115" font-size="13" fill="${K.ink}" text-anchor="middle">a₂</text>`;
+    s += `<circle cx="140" cy="190" r="16" fill="${K.soft}" stroke="${K.pri}" stroke-width="1.5"/><text x="132" y="195" font-size="13" fill="${K.ink}" text-anchor="middle">a₂</text>`;
+    s += `<line x1="66" y1="144" x2="124" y2="112" stroke="${K.line}"/><line x1="66" y1="156" x2="124" y2="188" stroke="${K.line}"/>`;
+    s += `<circle cx="230" cy="110" r="16" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="222" y="115" font-size="13" fill="${K.ink}" text-anchor="middle">a₃</text>`;
+    s += `<circle cx="230" cy="190" r="16" fill="${K.soft}" stroke="${K.ok}" stroke-width="1.5"/><text x="222" y="195" font-size="13" fill="${K.ink}" text-anchor="middle">a₃</text>`;
+    s += `<line x1="156" y1="110" x2="214" y2="110" stroke="${K.line}"/><line x1="156" y1="190" x2="214" y2="190" stroke="${K.line}"/>`;
+    s += `<text x="40" y="42" fill="${K.sub}" font-size="12">递推：aₙ₊₁ = f(aₙ)</text>`;
+    return S(300, 260, s);
+  };
 
   window.Fig = Fig;
 })();

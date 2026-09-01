@@ -556,5 +556,106 @@ window.Anim = (function () {
     box.appendChild(svg); box.appendChild(cap); box.appendChild(ctrls);
   }
 
-  return { chicken, general, melon, func, move, trip, geo, solid, conic };
+  /* ---------- 拓展：欧拉公式（单位圆旋转） ---------- */
+  function euler(box) {
+    box.innerHTML = "";
+    const W = 320, H = 320, cx = 160, cy = 160, R = 120;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:320px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 20, y1: cy, x2: 300, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: 20, x2: cx, y2: 300, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("circle", { cx, cy, r: R, fill: "none", stroke: "#2f6fed", "stroke-width": 2 }));
+    const projX = el("line", { x1: cx, y1: cy, x2: cx, y2: cy, stroke: "#dc2626", "stroke-width": 2, "stroke-dasharray": "4 3" });
+    const projY = el("line", { x1: cx, y1: cy, x2: cx, y2: cy, stroke: "#16a34a", "stroke-width": 2, "stroke-dasharray": "4 3" });
+    const radius = el("line", { x1: cx, y1: cy, x2: cx + R, y2: cy, stroke: "#d97706", "stroke-width": 3 });
+    const dot = el("circle", { cx: cx + R, cy, r: 5, fill: "#d97706" });
+    const label = el("text", { x: cx + R + 8, y: cy - 8, fill: "#334155", "font-size": 13 });
+    svg.appendChild(projX); svg.appendChild(projY); svg.appendChild(radius); svg.appendChild(dot); svg.appendChild(label);
+    const cap = document.createElement("div"); cap.className = "anim-cap";
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = "▶ 旋转演示";
+    function draw(theta) {
+      const x = cx + R * Math.cos(theta), y = cy - R * Math.sin(theta);
+      radius.setAttribute("x2", x); radius.setAttribute("y2", y);
+      projX.setAttribute("x2", x); projX.setAttribute("y2", cy);
+      projY.setAttribute("x1", x); projY.setAttribute("y1", y); projY.setAttribute("x2", x); projY.setAttribute("y2", cy);
+      dot.setAttribute("cx", x); dot.setAttribute("cy", y);
+      label.setAttribute("x", x + 6); label.setAttribute("y", y - 6);
+      label.textContent = `θ=${Math.round(theta * 180 / Math.PI)}°`;
+      info.textContent = `e^(iθ)=cosθ+i·sinθ　实部 ${Math.cos(theta).toFixed(2)}，虚部 ${Math.sin(theta).toFixed(2)}`;
+    }
+    let theta = 0, timer = null;
+    btn.onclick = () => {
+      if (timer) { clearInterval(timer); timer = null; btn.textContent = "▶ 旋转演示"; return; }
+      btn.textContent = "⏸ 暂停";
+      timer = setInterval(() => { theta += 0.06; if (theta > 2 * Math.PI) theta -= 2 * Math.PI; draw(theta); }, 40);
+    };
+    draw(0);
+    box.appendChild(svg); box.appendChild(cap); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  /* ---------- 拓展：泰勒级数（多项式逼近 e^x） ---------- */
+  function taylor(box) {
+    box.innerHTML = "";
+    const W = 360, H = 240, cx = 40, cy = 200;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:360px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: cx, y1: 10, x2: cx, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: cy, x2: 350, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    const X = v => cx + v * 30;
+    const Y = v => { let w = v; if (w > 11) w = 11; return cy - w * 14; };
+    function poly(fn, color, w) {
+      let pts = [];
+      for (let i = -1.2; i <= 3.0001; i += 0.1) { let v = fn(i); if (v > 11) v = 11; pts.push([X(i), Y(v)]); }
+      svg.appendChild(el("polyline", { points: pts.map(p => p[0] + "," + p[1]).join(" "), fill: "none", stroke: color, "stroke-width": w }));
+    }
+    poly(Math.exp, "#2f6fed", 2.5);
+    const approx = order => x => { let s = 0, f = 1; for (let k = 0; k <= order; k++) { s += Math.pow(x, k) / f; f *= (k + 1); } return s; };
+    let order = 1;
+    const ap = el("polyline", { fill: "none", stroke: "#d97706", "stroke-width": 2.5 });
+    svg.appendChild(ap);
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn";
+    function draw() {
+      let pts = [];
+      for (let i = -1.2; i <= 3.0001; i += 0.1) { let v = approx(order)(i); if (v > 11) v = 11; pts.push([X(i), Y(v)]); }
+      ap.setAttribute("points", pts.map(p => p[0] + "," + p[1]).join(" "));
+      const terms = [];
+      for (let k = 0; k <= order; k++) terms.push(k === 0 ? "1" : (k === 1 ? "x" : "x^" + k + "/" + k + "!"));
+      info.textContent = `P${order}(x) = ` + terms.join(" + ") + "（蓝：e^x，橙：近似）";
+      btn.textContent = "阶数 +1（当前 " + order + "）";
+    }
+    btn.onclick = () => { order = order >= 5 ? 1 : order + 1; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  /* ---------- 拓展：数形结合（象限定位） ---------- */
+  function numshape(box) {
+    box.innerHTML = "";
+    const W = 300, H = 300, cx = 150, cy = 150;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:300px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 20, y1: cy, x2: 280, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: 20, x2: cx, y2: 280, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("rect", { x: 20, y: 20, width: cx - 20, height: cy - 20, fill: "#eef3ff" }));
+    const dot = el("circle", { cx: cx - 50, cy: cy - 60, r: 6, fill: "#d97706" });
+    const label = el("text", { x: 30, y: 30, fill: "#334155", "font-size": 14 });
+    svg.appendChild(dot); svg.appendChild(label);
+    const pts = [[-2, 3, "第二象限"], [2, 3, "第一象限"], [-2, -3, "第三象限"], [2, -2, "第四象限"]];
+    let i = 0;
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn";
+    function draw() {
+      const [x, y, name] = pts[i];
+      dot.setAttribute("cx", cx + x * 22); dot.setAttribute("cy", cy - y * 22);
+      label.textContent = `点 (${x}, ${y}) 在${name}`;
+      info.textContent = "数形结合：横坐标定左右，纵坐标定上下。";
+    }
+    btn.onclick = () => { i = (i + 1) % pts.length; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape };
 })();

@@ -921,9 +921,249 @@
   }
 
   /* ============================================================
+   * 拓展专题（高中/大学先修）：欧拉公式、泰勒级数、数形结合、
+   *       数学归纳法、均值不等式、二项式定理、容斥原理、递推数列
+   * ============================================================ */
+  function qEuler(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("cosθ + i·sinθ", () => "cosθ − i·sinθ", () => "sinθ + i·cosθ", () => "e^θ");
+        q = "欧拉公式：e^(iθ) 等于？";
+        exp = "欧拉公式 e^(iθ) = cosθ + i·sinθ，把复数与三角联系起来。";
+      } else if (type === 1) {
+        o = opts("−1", () => "1", () => "i", () => "0");
+        q = "欧拉恒等式中 e^(iπ) 的值是？";
+        exp = "e^(iπ) = cosπ + i·sinπ = −1 + 0 = −1，故 e^(iπ) + 1 = 0。";
+      } else if (type === 2) {
+        o = opts("i", () => "−i", () => "1", () => "−1");
+        q = "e^(i·π/2) 的值是？";
+        exp = "e^(iπ/2) = cos(π/2) + i·sin(π/2) = 0 + i·1 = i。";
+      } else {
+        o = opts("1", () => "|cosθ|", () => "θ", () => "e^θ");
+        q = "复数 e^(iθ) 的模长 |e^(iθ)| 是？";
+        exp = "|cosθ + i·sinθ| = √(cos²θ + sin²θ) = 1，始终在单位圆上。";
+      }
+      results.push(Q(q, o, "基础", exp, "欧拉公式", "euler_circle"));
+    }
+    return results;
+  }
+
+  function qTaylor(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 5;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("1/24", () => "1/6", () => "1/12", () => "1/2");
+        q = "e^x 的麦克劳林展开中 x⁴ 项的系数是？";
+        exp = "e^x = Σ xⁿ/n!，x⁴ 系数 = 1/4! = 1/24。";
+      } else if (type === 1) {
+        o = opts("0", () => "1", () => "−1", () => "1/2");
+        q = "sin x 的麦克劳林展开中 x² 项的系数是？";
+        exp = "sin x = x − x³/3! + x⁵/5! − …，只含奇次幂，x² 系数为 0。";
+      } else if (type === 2) {
+        o = opts("−1/2", () => "1/2", () => "−1", () => "1");
+        q = "cos x 的麦克劳林展开中 x² 项的系数是？";
+        exp = "cos x = 1 − x²/2! + x⁴/4! − …，x² 系数 = −1/2。";
+      } else if (type === 3) {
+        o = opts("1", () => "−1", () => "1/2", () => "0");
+        q = "ln(1+x) 的麦克劳林展开中 x 项的系数是？";
+        exp = "ln(1+x) = x − x²/2 + x³/3 − …，x 项系数为 1。";
+      } else {
+        o = opts("1", () => "3", () => "1/3", () => "−1");
+        q = "把 1/(1−x) 展开成幂级数，x³ 项的系数是？";
+        exp = "等比级数 1/(1−x) = 1 + x + x² + x³ + …，x³ 系数 = 1。";
+      }
+      results.push(Q(q, o, "进阶", exp, "泰勒级数", "taylor_graph"));
+    }
+    return results;
+  }
+
+  function qNumShape(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 5;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("点 3", () => "原点", () => "点 0", () => "点 x");
+        q = "|x − 3| 的几何意义是数轴上点 x 到哪里的距离？";
+        exp = "|x − a| 表示点 x 到点 a 的距离，故 |x−3| 是到 3 的距离。";
+      } else if (type === 1) {
+        o = opts("x < −1 或 x > 1", () => "−1 < x < 1", () => "x > 1", () => "x < −1");
+        q = "用数形结合解不等式 x² − 1 > 0，解集是？";
+        exp = "抛物线 y = x² − 1 在 x 轴上方时 x² > 1，即 x < −1 或 x > 1。";
+      } else if (type === 2) {
+        o = opts("−1 和 3", () => "1 和 3", () => "−1 和 −3", () => "1 和 −3");
+        q = "函数 f(x) = x² − 2x − 3 的零点（与 x 轴交点横坐标）是？";
+        exp = "x² − 2x − 3 = 0 → (x−3)(x+1) = 0 → x = 3 或 x = −1。";
+      } else if (type === 3) {
+        o = opts("第二象限", () => "第一象限", () => "第三象限", () => "第四象限");
+        q = "点 (−2, 3) 在平面直角坐标系位于？";
+        exp = "x < 0、y > 0，属于第二象限。";
+      } else {
+        o = opts("0", () => "1", () => "−1", () => "不存在");
+        q = "用数形结合看函数 y = |x| 的最小值是？";
+        exp = "V 形图像顶点在原点 (0,0)，最小值为 0。";
+      }
+      results.push(Q(q, o, "基础", exp, "数形结合", "numshape_coord"));
+    }
+    return results;
+  }
+
+  function qInduction(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("验证 n 取初值（如 n=1）时命题成立", () => "令 n→∞", () => "证明 n=k+1", () => "直接写结论");
+        q = "用数学归纳法证明命题，第一步（奠基）要做的是？";
+        exp = "第一步验证起始值（如 n=1）时命题成立。";
+      } else if (type === 1) {
+        o = opts("由 n=k 成立推出 n=k+1 成立", () => "由 n=1 推出 n=2", () => "证明 n=k 成立", () => "令 n→∞");
+        q = "归纳法的第二步（递推）要证明的是？";
+        exp = "假设 n=k 成立，推出 n=k+1 也成立，形成递推链条。";
+      } else if (type === 2) {
+        o = opts("5050", () => "5000", () => "10100", () => "100");
+        q = "由归纳法可得 1 + 2 + … + 100 = ？";
+        exp = "公式 n(n+1)/2，100×101/2 = 5050。";
+      } else {
+        o = opts("7", () => "8", () => "6", () => "15");
+        q = "2⁰ + 2¹ + 2² = ？";
+        exp = "1 + 2 + 4 = 7 = 2³ − 1，符合等比求和公式。";
+      }
+      results.push(Q(q, o, "基础", exp, "数学归纳法", "induction_steps"));
+    }
+    return results;
+  }
+
+  function qAmGm(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("a + b ≥ 2√(ab)", () => "a + b ≤ 2√(ab)", () => "a + b = 2√(ab)", () => "无确定关系");
+        q = "对正数 a、b，基本均值不等式是？";
+        exp = "a + b ≥ 2√(ab)，当且仅当 a = b 取等号。";
+      } else if (type === 1) {
+        o = opts("4", () => "2", () => "8", () => "√4");
+        q = "x > 0 时，x + 4/x 的最小值（用均值不等式）是？";
+        exp = "x + 4/x ≥ 2√(x·4/x) = 2√4 = 4，当 x = 2 时取等。";
+      } else if (type === 2) {
+        o = opts("a = b = c", () => "a + b + c = 0", () => "任意正数", () => "a = 0");
+        q = "a + b + c ≥ 3·³√(abc) 等号成立的条件是？";
+        exp = "三元均值不等式等号当且仅当 a = b = c 时成立。";
+      } else {
+        o = opts("2", () => "1", () => "0", () => "√2");
+        q = "x > 0 时，x + 1/x 的最小值是？";
+        exp = "x + 1/x ≥ 2√(x·1/x) = 2，当 x = 1 时取等。";
+      }
+      results.push(Q(q, o, "进阶", exp, "均值不等式", "amgm_rect"));
+    }
+    return results;
+  }
+
+  function qBinomial(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 5;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("n + 1", () => "n", () => "2n", () => "n − 1");
+        q = "(a + b)^n 展开后共有多少项？";
+        exp = "从 aⁿ, a^{n−1}b, … 到 bⁿ 共 n + 1 项。";
+      } else if (type === 1) {
+        o = opts("3", () => "1", () => "6", () => "2");
+        q = "(a + b)³ 展开中 a²b 项的系数是？";
+        exp = "组合数为 C(3,1) = 3，故系数为 3。";
+      } else if (type === 2) {
+        o = opts("6", () => "4", () => "1", () => "24");
+        q = "(1 + x)^4 展开式中 x² 项的系数是？";
+        exp = "C(4,2) = 6，x² 系数为 6。";
+      } else if (type === 3) {
+        o = opts("1", () => "5", () => "x⁵", () => "0");
+        q = "(x + 1)^5 展开式的常数项是？";
+        exp = "取 x⁰ 项：C(5,5)·x⁰·1⁵ = 1，常数项为 1。";
+      } else {
+        o = opts("2ⁿ", () => "n", () => "n + 1", () => "2n");
+        q = "(a + b)^n 各项二项式系数之和是？";
+        exp = "令 a = b = 1，得系数和 = (1+1)^n = 2ⁿ。";
+      }
+      results.push(Q(q, o, "进阶", exp, "二项式定理", "binomial_triangle"));
+    }
+    return results;
+  }
+
+  function qInclusion(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("30", () => "35", () => "25", () => "5");
+        q = "班中 20 人会英语、15 人会日语，两种都会的 5 人，至少会一种的有几人？";
+        exp = "20 + 15 − 5 = 30（人）。容斥：会一种 + 会一种 − 都会。";
+      } else if (type === 1) {
+        o = opts("|A| + |B| − |A∩B|", () => "|A| + |B|", () => "|A|·|B|", () => "|A∩B|");
+        q = "两集合容斥原理：|A∪B| = ？";
+        exp = "|A∪B| = |A| + |B| − |A∩B|，减去重复计数的交集。";
+      } else if (type === 2) {
+        o = opts("+ |A∩B∩C|", () => "0", () => "− |A∩B∩C|", () => "|A|·|B|·|C|");
+        q = "三集合 |A∪B∪C| = |A|+|B|+|C| − (两两交之和) + ？";
+        exp = "加回被多减一次的三者交集 |A∩B∩C|。";
+      } else {
+        o = opts("67", () => "50", () => "33", () => "83");
+        q = "1 到 100 中能被 2 或 3 整除的数共有几个？";
+        exp = "被2整除50个、被3整除33个、被6整除16个 → 50+33−16 = 67。";
+      }
+      results.push(Q(q, o, "进阶", exp, "容斥原理", "inclusion_venn"));
+    }
+    return results;
+  }
+
+  function qRecurrence(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("16", () => "8", () => "32", () => "2");
+        q = "数列 a₁ = 1，a_{n+1} = 2a_n，则 a₅ = ？";
+        exp = "等比型：a_n = 2^{n−1}，a₅ = 2⁴ = 16。";
+      } else if (type === 1) {
+        o = opts("17", () => "15", () => "20", () => "18");
+        q = "数列 a₁ = 2，a_{n+1} = a_n + 3，则 a₆ = ？";
+        exp = "等差型：a_n = 2 + 3(n−1)，a₆ = 2 + 15 = 17。";
+      } else if (type === 2) {
+        o = opts("15", () => "7", () => "16", () => "31");
+        q = "数列 a₁ = 1，a_{n+1} = 2a_n + 1，则 a₄ = ？";
+        exp = "逐项算：1 → 3 → 7 → 15，故 a₄ = 15。";
+      } else {
+        o = opts("3^{n−1}", () => "3ⁿ", () => "n³", () => "3n");
+        q = "数列 1, 3, 9, 27, … 的通项 a_n = ？";
+        exp = "首项1、公比3的等比数列，a_n = 3^{n−1}。";
+      }
+      results.push(Q(q, o, "进阶", exp, "递推数列", "recurrence_tree"));
+    }
+    return results;
+  }
+
+  /* ============================================================
    * 注册到 window.TECHNIQUES
    * ============================================================ */
   const GEN = {
+    euler: qEuler,
+    taylor: qTaylor,
+    numshape: qNumShape,
+    induction: qInduction,
+    amgm: qAmGm,
+    binomial: qBinomial,
+    inclusion_hs: qInclusion,
+    recurrence: qRecurrence,
     set: qSet,
     funcconcept: qFuncConcept,
     explog: qExpLog,
