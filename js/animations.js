@@ -784,5 +784,65 @@ window.Anim = (function () {
     box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
   }
 
-  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape, tree, linearprog, normal, cgeo };
+  /* ---------- 拓展：重要极限 sinx/x → 1 ---------- */
+  function lim(box) {
+    box.innerHTML = "";
+    const W = 360, H = 200, cx = 180, cy = 150;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:360px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 10, y1: cy, x2: 350, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    svg.appendChild(el("line", { x1: cx, y1: 20, x2: cx, y2: 190, stroke: "#334155", "stroke-width": 1.5 }));
+    const poly = el("polyline", { fill: "none", stroke: "#2f6fed", "stroke-width": 2.5 });
+    svg.appendChild(poly);
+    const y1 = el("line", { x1: 10, y1: cy - 50, x2: 350, y2: cy - 50, stroke: "#16a34a", "stroke-dasharray": "4 3" });
+    svg.appendChild(y1);
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = "▶ 让 x→0";
+    let k = 1;
+    function draw() {
+      const span = 2.6 / k;
+      let pts = [];
+      for (let i = 0; i <= 120; i++) { const x = -span + i * (2 * span / 120); const px = cx + x * 60; let v = x === 0 ? 1 : Math.sin(x) / x; const py = cy - 50 * v; pts.push(px.toFixed(1) + "," + py.toFixed(1)); }
+      poly.setAttribute("points", pts.join(" "));
+      info.textContent = "x 区间 ±" + span.toFixed(2) + " 时，曲线在极限值 1（绿线）附近收敛。";
+      btn.textContent = "▶ 让 x→0（当前 ×" + k + "）";
+    }
+    btn.onclick = () => { k = k >= 6 ? 1 : k + 1; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  /* ---------- 拓展：函数图像变换 ---------- */
+  function gtrans(box) {
+    box.innerHTML = "";
+    const W = 360, H = 220, cy = 180;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, style: "width:100%;max-width:360px;height:auto;display:block" });
+    svg.appendChild(el("line", { x1: 10, y1: cy, x2: 350, y2: cy, stroke: "#334155", "stroke-width": 1.5 }));
+    const base = el("path", { fill: "none", stroke: "#94a3b8", "stroke-width": 2 });
+    const moved = el("path", { fill: "none", stroke: "#2f6fed", "stroke-width": 2.5 });
+    svg.appendChild(base); svg.appendChild(moved);
+    const info = document.createElement("div"); info.className = "anim-cap";
+    const ctrls = document.createElement("div"); ctrls.className = "anim-ctrls";
+    const btn = document.createElement("button"); btn.className = "btn";
+    let k = 0;
+    const modes = [
+      { name: "右移 a：y=f(x−a)", dx: 60, f: x => cy - 40 * Math.exp(-((x - 150 - 60) * (x - 150 - 60)) / 2000) },
+      { name: "关于 y 轴：y=f(−x)", dx: 0, f: x => cy - 40 * Math.exp(-((150 - x) * (150 - x)) / 2000) },
+      { name: "纵向拉伸 2 倍", dx: 0, f: x => cy - 80 * Math.exp(-((x - 150) * (x - 150)) / 2000) }
+    ];
+    function draw() {
+      const m = modes[k % 3];
+      let b = [], mv = [];
+      for (let x = 20; x <= 340; x += 4) { b.push(x + "," + (cy - 40 * Math.exp(-((x - 150) * (x - 150)) / 2000)).toFixed(1)); mv.push(x + "," + m.f(x).toFixed(1)); }
+      base.setAttribute("d", "M " + b.join(" L "));
+      moved.setAttribute("d", "M " + mv.join(" L "));
+      info.textContent = m.name;
+      btn.textContent = "▶ 切换变换（" + ((k % 3) + 1) + "/3）";
+    }
+    btn.onclick = () => { k = (k + 1) % 3; draw(); };
+    draw();
+    box.appendChild(svg); box.appendChild(info); box.appendChild(ctrls); ctrls.appendChild(btn);
+  }
+
+  return { chicken, general, melon, func, move, trip, geo, solid, conic, euler, taylor, numshape, tree, linearprog, normal, cgeo, lim, gtrans };
 })();

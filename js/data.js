@@ -2250,5 +2250,173 @@ window.TECHNIQUES = [
       { q: "Σ_{n=1}^∞ (1/2)ⁿ 的和？", opts: ["1","1/2","2","0"], ans: 0, level: "进阶",
         explain: "首项 1/2、公比 1/2，和=(1/2)/(1−1/2)=1。", point: "求和" }
     ]
+  },
+  {
+    id: "coord_geo", grade: "十一年级", stage: "高中", name: "解析几何综合", anim: null,
+    summary: "用坐标法研究几何：两点距离、中点、斜率、圆方程，是圆锥曲线的基石。",
+    kou: "距离用勾股，中点是平均，斜率看升降，圆方程凑平方。",
+    steps: [
+      "两点距离 d=√[(x₂−x₁)²+(y₂−y₁)²]。",
+      "中点 M((x₁+x₂)/2,(y₁+y₂)/2)；斜率 k=(y₂−y₁)/(x₂−x₁)。",
+      "圆标准方程 (x−a)²+(y−b)²=r²（圆心(a,b)、半径r）。"
+    ],
+    prereq: "func1",
+    questions: [
+      { q: "两点 A(1,2)、B(4,6) 的距离？", opts: ["5","√13","7","3"], ans: 0, level: "基础",
+        explain: "d=√[(4−1)²+(6−2)²]=√(9+16)=5。", point: "距离" },
+      { q: "线段 AB：A(2,4)、B(6,8) 的中点？", opts: ["(4,6)","(2,4)","(6,8)","(4,4)"], ans: 0, level: "基础",
+        explain: "中点=((2+6)/2,(4+8)/2)=(4,6)。", point: "中点" },
+      { q: "过 A(0,0)、B(3,6) 的直线斜率？", opts: ["2","1/2","3","0"], ans: 0, level: "基础",
+        explain: "k=(6−0)/(3−0)=2。", point: "斜率" },
+      { q: "圆心(1,−2)、半径3的圆方程？", opts: ["(x−1)²+(y+2)²=9","(x+1)²+(y−2)²=9","x²+y²=9","(x−1)²+y²=9"], ans: 0, level: "进阶",
+        explain: "(x−1)²+(y+2)²=3²=9。", point: "圆方程" }
+    ]
+  },
+  {
+    id: "jensen", grade: "十二年级+", stage: "高中", name: "琴生不等式与凸函数", anim: null,
+    summary: "凸函数满足 Jensen：中点函数值 ≤ 函数值平均。由此推出均值不等式链 Q≥A≥G≥H。",
+    kou: "二阶导正为凸，凸函数中点最低；Q≥A≥G≥H 记心间。",
+    steps: [
+      "f''>0 ⇒ f 下凸（凸），f''<0 ⇒ 上凸（凹）。",
+      "凸函数：f((x+y)/2) ≤ [f(x)+f(y)]/2。",
+      "对正数：平方平均 Q ≥ 算术平均 A ≥ 几何平均 G ≥ 调和平均 H。"
+    ],
+    prereq: "amgm",
+    questions: [
+      { q: "f(x)=x² 的凹凸性？", opts: ["下凸（凸）","上凸（凹）","常数","无凹凸"], ans: 0, level: "基础",
+        explain: "f''=2>0，下凸。", point: "凹凸" },
+      { q: "f 下凸时，f((x+y)/2) 与 [f(x)+f(y)]/2 关系？", opts: ["≤","≥","=","无关"], ans: 0, level: "进阶",
+        explain: "凸函数满足 f((x+y)/2) ≤ [f(x)+f(y)]/2。", point: "琴生" },
+      { q: "正数 a,b 的四个平均大小？", opts: ["Q≥A≥G≥H","A≥Q≥G≥H","G≥A≥H≥Q","H≥G≥A≥Q"], ans: 0, level: "进阶",
+        explain: "平方平均≥算术平均≥几何平均≥调和平均。", point: "均值链" },
+      { q: "由 Jensen 对 f(t)=eᵗ 得？", opts: ["e^{(x+y)/2}≤(eˣ+eʸ)/2","e^{(x+y)/2}≥(eˣ+eʸ)/2","e^{(x+y)/2}=(eˣ+eʸ)/2","无关"], ans: 0, level: "进阶",
+        explain: "eᵗ 下凸，故 e^{(x+y)/2}≤(eˣ+eʸ)/2。", point: "应用" }
+    ]
+  },
+  {
+    id: "important_limit", grade: "十二年级+", stage: "高中", name: "重要极限", anim: "lim",
+    summary: "两个重要极限：lim sinx/x=1 与 lim(1+1/x)^x=e，是求导与连续复利的理论基石。",
+    kou: "一极限一，二极限 e；sin比x趋于1，括号一加一比x趋于 e。",
+    steps: [
+      "lim_{x→0} sin x / x = 1。",
+      "lim_{x→∞} (1+1/x)^x = e ≈ 2.71828。",
+      "lim_{x→0} (1+x)^{1/x} = e（令 t=1/x）。"
+    ],
+    prereq: "derivative",
+    questions: [
+      { q: "lim_{x→0} sin x / x = ？", opts: ["1","0","∞","不存在"], ans: 0, level: "基础",
+        explain: "重要极限一 = 1。", point: "极限一" },
+      { q: "lim_{x→∞} (1+1/x)^x = ？", opts: ["e","1","∞","0"], ans: 0, level: "基础",
+        explain: "重要极限二 = e。", point: "极限二" },
+      { q: "lim_{n→∞} (1+1/n)^n = ？", opts: ["e","1","2","∞"], ans: 0, level: "基础",
+        explain: "离散情形极限也是 e。", point: "极限二" },
+      { q: "lim_{x→0} (1+x)^{1/x} = ？", opts: ["e","1","0","∞"], ans: 0, level: "基础",
+        explain: "令 t=1/x 即化为重要极限二 = e。", point: "极限二" }
+    ]
+  },
+  {
+    id: "de_moivre", grade: "十年级", stage: "高中", name: "棣莫弗定理", anim: null,
+    summary: "(cosθ+i sinθ)^n = cos(nθ)+i sin(nθ)。可快捷计算复数幂、求 n 次方根与单位根。",
+    kou: "幂次乘辐角，模长取 n 次；方根均分辐角 2π。",
+    steps: [
+      "(cosθ+i sinθ)^n = cos(nθ)+i sin(nθ)。",
+      "z=r(cosθ+i sinθ) 的 n 次方根：模 r^{1/n}，辐角 (θ+2kπ)/n。",
+      "方程 zⁿ=1 有 n 个单位根 e^{2πik/n}。"
+    ],
+    prereq: "complex",
+    questions: [
+      { q: "(cosθ+i sinθ)³ = ？", opts: ["cos3θ+i sin3θ","cosθ+i sin3θ","3(cosθ+i sinθ)","cos3θ·sin3θ"], ans: 0, level: "基础",
+        explain: "棣莫弗：(cosθ+i sinθ)³=cos3θ+i sin3θ。", point: "定理" },
+      { q: "z²=1 的复数根有几个？", opts: ["2","1","无穷多","0"], ans: 0, level: "基础",
+        explain: "zⁿ=1 有 n 个根，n=2 时 2 个：±1。", point: "单位根" },
+      { q: "4(cosπ+i sinπ) 的平方根模为？", opts: ["2","4","16","√2"], ans: 0, level: "进阶",
+        explain: "模 r^{1/2}=√4=2。", point: "方根" },
+      { q: "(1+i)⁴ = ？", opts: ["-4","2i","4","16"], ans: 0, level: "进阶",
+        explain: "(1+i)²=2i，(1+i)^4=(2i)²=-4。", point: "计算" }
+    ]
+  },
+  {
+    id: "random_var", grade: "十二年级", stage: "高中", name: "随机变量与数字特征", anim: null,
+    summary: "随机变量的期望与方差有线性性质：E(aX+b)=aE(X)+b，D(aX+b)=a²D(X)。",
+    kou: "期望线性加乘，方差只乘平方；两点 E=p、二项 E=np。",
+    steps: [
+      "期望线性：E(aX+b)=aE(X)+b；方差 D(aX+b)=a²D(X)。",
+      "两点分布 X~B(1,p)：E=p，D=p(1-p)。",
+      "二项分布 X~B(n,p)：E=np，D=np(1-p)。"
+    ],
+    prereq: "dist_exp",
+    questions: [
+      { q: "E(X)=3，则 E(2X+1)=？", opts: ["7","6","4","2"], ans: 0, level: "基础",
+        explain: "E(2X+1)=2·3+1=7。", point: "期望" },
+      { q: "D(X)=2，则 D(3X)=？", opts: ["18","6","2","9"], ans: 0, level: "基础",
+        explain: "D(3X)=3²·2=18。", point: "方差" },
+      { q: "X~B(1,0.6)，E、D 是？", opts: ["E=0.6,D=0.24","E=0.6,D=0.36","E=0.24,D=0.6","E=1,D=0.6"], ans: 0, level: "进阶",
+        explain: "两点分布 E=p=0.6，D=p(1-p)=0.24。", point: "两点" },
+      { q: "X~B(10,0.5)，E、D 是？", opts: ["E=5,D=2.5","E=10,D=2.5","E=5,D=5","E=0.5,D=5"], ans: 0, level: "进阶",
+        explain: "二项 E=np=5，D=np(1-p)=2.5。", point: "二项" }
+    ]
+  },
+  {
+    id: "fourier", grade: "大学先修", stage: "高中", name: "傅里叶级数初步", anim: null,
+    summary: "周期函数展开为三角级数：奇函数只含正弦项，偶函数只含余弦项。",
+    kou: "周期函数三角展，奇含正弦偶含余弦；基频 2π/T 莫忘。",
+    steps: [
+      "f(x) ~ a₀/2 + Σ(aₙ cos nx + bₙ sin nx)。",
+      "奇函数（f(−x)=−f(x)）：aₙ=0，仅正弦项。",
+      "偶函数（f(−x)=f(x)）：bₙ=0，仅余弦项；基频 ω=2π/T。"
+    ],
+    prereq: "trig",
+    questions: [
+      { q: "周期 2π 函数展开为？", opts: ["a₀/2+Σ(aₙcosnx+bₙsinnx)","Σaₙxⁿ","Σaₙeⁿ","a₀+Σaₙcosnx"], ans: 0, level: "基础",
+        explain: "傅里叶级数形式。", point: "级数" },
+      { q: "奇函数傅里叶展开含？", opts: ["只有正弦项","只有余弦项","只有常数项","正弦余弦都有"], ans: 0, level: "基础",
+        explain: "奇函数 aₙ=0，仅正弦项。", point: "奇" },
+      { q: "偶函数傅里叶展开含？", opts: ["只有余弦项","只有正弦项","只有常数项","正弦余弦都有"], ans: 0, level: "基础",
+        explain: "偶函数 bₙ=0，仅余弦项。", point: "偶" },
+      { q: "周期 T=4 的函数基频 ω=？", opts: ["π/2","π/4","2π","4/(2π)"], ans: 0, level: "进阶",
+        explain: "ω=2π/T=2π/4=π/2。", point: "基频" }
+    ]
+  },
+  {
+    id: "integral_app", grade: "十二年级+", stage: "高中", name: "定积分应用", anim: null,
+    summary: "定积分可求平面图形面积、旋转体体积、曲线弧长与函数平均值。",
+    kou: "面积是积分，体积 π 积分平方，弧长积根号一加导平方。",
+    steps: [
+      "面积 S=∫_a^b f(x)dx（f≥0）。",
+      "绕 x 轴旋转体积 V=π∫_a^b f(x)² dx。",
+      "弧长 L=∫_a^b √(1+(y')²) dx；平均值= S/(b−a)。"
+    ],
+    prereq: "definite_int",
+    questions: [
+      { q: "y=x 在 [0,2] 与 x 轴围成面积？", opts: ["2","4","1","8"], ans: 0, level: "基础",
+        explain: "∫₀² x dx = x²/2|₀² = 2。", point: "面积" },
+      { q: "y=x 绕 x 轴 [0,2] 旋转体积 V=π∫x²dx？", opts: ["8π/3","2π/3","8π","4π"], ans: 0, level: "进阶",
+        explain: "π·x³/3|₀² = 8π/3。", point: "体积" },
+      { q: "y=x 在 [0,2] 的平均值？", opts: ["1","2","√2","4"], ans: 0, level: "进阶",
+        explain: "平均值=(1/2)∫₀²x dx=1。", point: "平均" },
+      { q: "y=x 在 [0,2] 弧长？", opts: ["2√2","2","4","2√3"], ans: 0, level: "进阶",
+        explain: "∫₀²√(1+1)dx=2√2。", point: "弧长" }
+    ]
+  },
+  {
+    id: "graph_transform", grade: "八年级", stage: "中学", name: "函数图像变换", anim: "gtrans",
+    summary: "平移（左加右减、上加下减）、对称（y轴/f(-x)、x轴/-f(x)）、伸缩与翻折（|f(x)|）。",
+    kou: "左加右减平移，上加下减纵向；y取负对y轴，值取负对x轴。",
+    steps: [
+      "平移：y=f(x−a) 右移 a；y=f(x)+b 上移 b（左加右减）。",
+      "对称：y=f(−x) 关于 y 轴；y=−f(x) 关于 x 轴。",
+      "翻折：y=|f(x)| 把 x 轴下方部分翻折到上方。"
+    ],
+    prereq: "func1",
+    questions: [
+      { q: "y=f(x)→y=f(x−3) 的变换？", opts: ["右移3","左移3","上移3","关于y轴对称"], ans: 0, level: "基础",
+        explain: "x−3：右移3（左加右减）。", point: "平移" },
+      { q: "y=f(x)→y=f(−x) 的变换？", opts: ["关于y轴对称","关于x轴对称","关于原点对称","右移1"], ans: 0, level: "基础",
+        explain: "x 取负，关于 y 轴对称。", point: "对称" },
+      { q: "y=f(x)→y=2f(x) 的变换？", opts: ["纵向拉伸2倍","横向拉伸2倍","纵向压缩2倍","右移2"], ans: 0, level: "基础",
+        explain: "系数乘函数值：纵坐标变 2 倍。", point: "伸缩" },
+      { q: "y=f(x)→y=|f(x)| 的变换？", opts: ["下方翻折到上方","左半翻折到右","整体上移","关于y轴对称"], ans: 0, level: "基础",
+        explain: "保留上方，下方沿 x 轴翻折到上方。", point: "翻折" }
+    ]
   }
 ];

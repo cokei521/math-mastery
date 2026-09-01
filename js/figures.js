@@ -1070,7 +1070,16 @@
     "ineq_scale::0": "ineq_scale", "ineq_scale::1": "ineq_scale", "ineq_scale::2": "ineq_scale", "ineq_scale::3": "ineq_scale",
     "seq_ineq::0": "seq_ineq", "seq_ineq::1": "seq_ineq", "seq_ineq::2": "seq_ineq", "seq_ineq::3": "seq_ineq",
     "complex_geo::0": "complex_plane", "complex_geo::1": "complex_plane", "complex_geo::2": "complex_plane", "complex_geo::3": "complex_plane",
-    "series::0": "series_partial", "series::1": "series_partial", "series::2": "series_partial", "series::3": "series_partial"
+    "series::0": "series_partial", "series::1": "series_partial", "series::2": "series_partial", "series::3": "series_partial",
+    /* 第四批拓展 */
+    "coord_geo::0": "coord_dist", "coord_geo::1": "coord_mid", "coord_geo::2": "coord_slope", "coord_geo::3": "coord_circle",
+    "jensen::0": "jensen_conv", "jensen::1": "jensen_ineq", "jensen::2": "jensen_means", "jensen::3": "jensen_ineq",
+    "important_limit::0": "lim_sinx", "important_limit::1": "lim_exp", "important_limit::2": "lim_exp", "important_limit::3": "lim_exp",
+    "de_moivre::0": "demoivre_pow", "de_moivre::1": "demoivre_root", "de_moivre::2": "demoivre_unit", "de_moivre::3": "demoivre_pow",
+    "random_var::0": "rv_linear", "random_var::1": "rv_linear", "random_var::2": "rv_bernoulli", "random_var::3": "rv_binom",
+    "fourier::0": "fourier_series", "fourier::1": "fourier_odd", "fourier::2": "fourier_even", "fourier::3": "fourier_series",
+    "integral_app::0": "int_area", "integral_app::1": "int_volume", "integral_app::2": "int_avg", "integral_app::3": "int_arc",
+    "graph_transform::0": "gtrans_shift", "graph_transform::1": "gtrans_sym", "graph_transform::2": "gtrans_scale", "graph_transform::3": "gtrans_abs"
   };
 
 
@@ -1388,6 +1397,223 @@
     });
     s += `<line x1="${cx}" y1="${cy-120}" x2="280" y2="${cy-120}" stroke="${K.ok}" stroke-dasharray="4 3" stroke-width="1.5"/>`;
     s += `<text x="190" y="${cy-126}" fill="${K.ok}" font-size="11">极限和 S</text>`;
+    return S(W, H, s);
+  };
+
+  /* ===================== 第四批拓展配图 ===================== */
+  Fig.coord_dist = function () {
+    const W = 300, H = 200, cx = 60, cy = 170;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="190" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<circle cx="90" cy="120" r="4" fill="${K.pri}"/><circle cx="220" cy="60" r="4" fill="${K.pri}"/>`;
+    s += `<line x1="90" y1="120" x2="220" y2="60" stroke="${K.ok}" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<text x="135" y="92" fill="${K.ok}" font-size="11">d</text>`;
+    s += `<text x="80" y="138" fill="${K.sub}" font-size="11">A</text><text x="226" y="55" fill="${K.sub}" font-size="11">B</text>`;
+    return S(W, H, s);
+  };
+  Fig.coord_mid = function () {
+    const W = 300, H = 200, cy = 150;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<circle cx="60" cy="${cy}" r="4" fill="${K.pri}"/><circle cx="240" cy="${cy}" r="4" fill="${K.pri}"/>`;
+    s += `<circle cx="150" cy="${cy}" r="5" fill="${K.ok}"/>`;
+    s += `<line x1="60" y1="${cy}" x2="240" y2="${cy}" stroke="${K.sub}" stroke-width="1.5"/>`;
+    s += `<text x="145" y="${cy-10}" fill="${K.ok}" font-size="11">M</text>`;
+    return S(W, H, s);
+  };
+  Fig.coord_slope = function () {
+    const W = 300, H = 200;
+    let s = `<line x1="20" y1="180" x2="280" y2="180" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="20" y1="20" x2="280" y2="20" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="40" y1="160" x2="250" y2="50" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<text x="120" y="105" fill="${K.pri}" font-size="11">k>0 上升</text>`;
+    return S(W, H, s);
+  };
+  Fig.coord_circle = function () {
+    const W = 280, H = 220, cx = 140, cy = 110;
+    let s = `<line x1="10" y1="${cy}" x2="270" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="15" x2="${cx}" y2="205" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="70" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="4" fill="${K.ok}"/>`;
+    s += `<text x="${cx+6}" y="${cy-6}" fill="${K.ok}" font-size="11">圆心</text>`;
+    return S(W, H, s);
+  };
+  Fig.jensen_conv = function () {
+    const W = 300, H = 200, cy = 180;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    let d = "M 30 170 Q 150 20 270 170";
+    s += `<path d="${d}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="30" y1="170" x2="270" y2="170" stroke="${K.sub}" stroke-width="1.5"/>`;
+    s += `<text x="110" y="70" fill="${K.ok}" font-size="11">下凸（弦在上）</text>`;
+    return S(W, H, s);
+  };
+  Fig.jensen_ineq = function () {
+    const W = 300, H = 200, cy = 180;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 40 160 Q 150 60 260 160" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="40" y1="160" x2="260" y2="160" stroke="${K.sub}" stroke-width="1.5"/>`;
+    s += `<line x1="150" y1="160" x2="150" y2="118" stroke="${K.ok}" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<text x="155" y="112" fill="${K.ok}" font-size="11">f中点≤均值</text>`;
+    return S(W, H, s);
+  };
+  Fig.jensen_means = function () {
+    const W = 300, H = 180;
+    const rows = [["Q", 40, 240], ["A", 60, 220], ["G", 85, 195], ["H", 110, 170]];
+    let s = "";
+    rows.forEach((r, i) => {
+      const y = 30 + i * 35;
+      s += `<line x1="${r[1]}" y1="${y}" x2="${r[2]}" y2="${y}" stroke="${K.pri}" stroke-width="6" stroke-linecap="round"/>`;
+      s += `<text x="10" y="${y+4}" fill="${K.sub}" font-size="11">${r[0]}</text>`;
+    });
+    return S(W, H, s);
+  };
+  Fig.lim_sinx = function () {
+    const W = 300, H = 200, cx = 150, cy = 150;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="190" stroke="${K.ink}" stroke-width="1.2"/>`;
+    let pts = [];
+    for (let i = 0; i <= 60; i++) { const x = -2.6 + i * 0.087; const px = cx + x * 50; const py = cy - 50 * Math.sin(x) / x; pts.push(px.toFixed(1) + "," + py.toFixed(1)); }
+    s += `<polyline points="${pts.join(" ")}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="10" y1="${cy-50}" x2="290" y2="${cy-50}" stroke="${K.ok}" stroke-dasharray="4 3"/>`;
+    s += `<text x="210" y="${cy-56}" fill="${K.ok}" font-size="11">极限 1</text>`;
+    return S(W, H, s);
+  };
+  Fig.lim_exp = function () {
+    const W = 300, H = 200, cx = 150, cy = 150;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="20" x2="${cx}" y2="190" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="10" y1="${cy-110}" x2="290" y2="${cy-110}" stroke="${K.ok}" stroke-dasharray="4 3"/>`;
+    s += `<text x="200" y="${cy-116}" fill="${K.ok}" font-size="11">e ≈ 2.718</text>`;
+    s += `<path d="M 20 170 Q 150 15 280 40" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    return S(W, H, s);
+  };
+  Fig.demoivre_pow = function () {
+    const W = 240, H = 240, cx = 120, cy = 120;
+    let s = `<line x1="10" y1="${cy}" x2="230" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="10" x2="${cx}" y2="230" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="80" fill="none" stroke="${K.sub}" stroke-width="1.2"/>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="${cx+69}" y2="${cy-40}" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<text x="${cx+40}" y="${cy-30}" fill="${K.pri}" font-size="11">θ→nθ</text>`;
+    return S(W, H, s);
+  };
+  Fig.demoivre_root = function () {
+    const W = 240, H = 240, cx = 120, cy = 120, R = 80;
+    let s = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${K.sub}" stroke-width="1.2"/>`;
+    for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2; const x = cx + R * Math.cos(a), y = cy - R * Math.sin(a); s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${K.pri}"/>`; }
+    s += `<line x1="10" y1="${cy}" x2="230" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    return S(W, H, s);
+  };
+  Fig.demoivre_unit = function () {
+    const W = 240, H = 240, cx = 120, cy = 120, R = 80;
+    let s = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    for (let k = 0; k < 5; k++) { const a = k * 2 * Math.PI / 5; const x = cx + R * Math.cos(a), y = cy - R * Math.sin(a); s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${K.ok}"/>`; }
+    return S(W, H, s);
+  };
+  Fig.rv_linear = function () {
+    const W = 300, H = 160, cy = 90;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<circle cx="100" cy="${cy}" r="5" fill="${K.sub}"/><text x="86" y="${cy+18}" fill="${K.sub}" font-size="11">E(X)</text>`;
+    s += `<circle cx="190" cy="${cy}" r="6" fill="${K.pri}"/><text x="178" y="${cy-14}" fill="${K.pri}" font-size="11">aE(X)+b</text>`;
+    s += `<line x1="100" y1="${cy}" x2="190" y2="${cy}" stroke="${K.ok}" stroke-dasharray="4 3"/>`;
+    return S(W, H, s);
+  };
+  Fig.rv_bernoulli = function () {
+    const W = 280, H = 200, cy = 170;
+    let s = `<line x1="20" y1="${cy}" x2="260" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<rect x="80" y="60" width="40" height="110" fill="${K.pri}"/><text x="78" y="188" fill="${K.sub}" font-size="11">X=1 (p)</text>`;
+    s += `<rect x="160" y="120" width="40" height="50" fill="${K.sub}"/><text x="158" y="188" fill="${K.sub}" font-size="11">X=0</text>`;
+    return S(W, H, s);
+  };
+  Fig.rv_binom = function () {
+    const W = 300, H = 200, cy = 180;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    const hs = [40, 90, 120, 90, 40];
+    hs.forEach((h, i) => { s += `<rect x="${40 + i * 42}" y="${cy - h}" width="26" height="${h}" fill="${K.pri}" opacity="0.85"/>`; });
+    return S(W, H, s);
+  };
+  Fig.fourier_series = function () {
+    const W = 300, H = 200, cy = 100;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    let pts = [];
+    for (let i = 0; i <= 120; i++) { const x = -3 + i * 0.05; const y = Math.sin(x) + 0.4 * Math.sin(3 * x); pts.push((10 + (x + 3) * 47).toFixed(1) + "," + (cy - 40 * y).toFixed(1)); }
+    s += `<polyline points="${pts.join(" ")}" fill="none" stroke="${K.pri}" stroke-width="2"/>`;
+    return S(W, H, s);
+  };
+  Fig.fourier_odd = function () {
+    const W = 300, H = 200, cy = 100;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    let pts = [];
+    for (let i = 0; i <= 120; i++) { const x = -3 + i * 0.05; pts.push((10 + (x + 3) * 47).toFixed(1) + "," + (cy - 50 * Math.sin(x)).toFixed(1)); }
+    s += `<polyline points="${pts.join(" ")}" fill="none" stroke="${K.pri}" stroke-width="2"/>`;
+    return S(W, H, s);
+  };
+  Fig.fourier_even = function () {
+    const W = 300, H = 200, cy = 100;
+    let s = `<line x1="10" y1="${cy}" x2="290" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    let pts = [];
+    for (let i = 0; i <= 120; i++) { const x = -3 + i * 0.05; pts.push((10 + (x + 3) * 47).toFixed(1) + "," + (cy - 50 * Math.cos(x)).toFixed(1)); }
+    s += `<polyline points="${pts.join(" ")}" fill="none" stroke="${K.pri}" stroke-width="2"/>`;
+    return S(W, H, s);
+  };
+  Fig.int_area = function () {
+    const W = 300, H = 200, cy = 170;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 50 ${cy} L 50 90 Q 150 40 250 ${cy} Z" fill="${K.pri}" opacity="0.3"/>`;
+    s += `<path d="M 50 90 Q 150 40 250 ${cy}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<text x="120" y="120" fill="${K.ok}" font-size="11">面积 S</text>`;
+    return S(W, H, s);
+  };
+  Fig.int_volume = function () {
+    const W = 260, H = 220, cy = 200;
+    let s = `<path d="M 70 ${cy} Q 70 50 130 50 Q 190 50 190 ${cy} Z" fill="${K.pri}" opacity="0.3" stroke="${K.pri}" stroke-width="2"/>`;
+    s += `<ellipse cx="130" cy="50" rx="60" ry="12" fill="none" stroke="${K.sub}" stroke-width="1.2"/>`;
+    s += `<text x="100" y="120" fill="${K.ok}" font-size="11">V=π∫f²</text>`;
+    return S(W, H, s);
+  };
+  Fig.int_avg = function () {
+    const W = 300, H = 200, cy = 150;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 50 ${cy} Q 150 40 250 ${cy}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<line x1="40" y1="${cy-30}" x2="260" y2="${cy-30}" stroke="${K.ok}" stroke-dasharray="4 3"/>`;
+    s += `<text x="190" y="${cy-36}" fill="${K.ok}" font-size="11">平均值</text>`;
+    return S(W, H, s);
+  };
+  Fig.int_arc = function () {
+    const W = 300, H = 200, cy = 170;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 50 ${cy} Q 150 30 250 ${cy}" fill="none" stroke="${K.pri}" stroke-width="3"/>`;
+    s += `<text x="120" y="90" fill="${K.ok}" font-size="11">弧长 L</text>`;
+    return S(W, H, s);
+  };
+  Fig.gtrans_shift = function () {
+    const W = 300, H = 200, cy = 150;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 30 130 Q 120 50 210 130" fill="none" stroke="${K.sub}" stroke-width="2"/>`;
+    s += `<path d="M 90 130 Q 180 50 270 130" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<text x="150" y="60" fill="${K.pri}" font-size="11">右移 a</text>`;
+    return S(W, H, s);
+  };
+  Fig.gtrans_sym = function () {
+    const W = 300, H = 200, cy = 150;
+    let s = `<line x1="150" y1="20" x2="150" y2="190" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 150 60 Q 220 100 150 160" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<path d="M 150 60 Q 80 100 150 160" fill="none" stroke="${K.sub}" stroke-width="2"/>`;
+    s += `<text x="155" y="40" fill="${K.pri}" font-size="11">f(x) 与 f(−x) 对称 y 轴</text>`;
+    return S(W, H, s);
+  };
+  Fig.gtrans_scale = function () {
+    const W = 300, H = 200, cy = 160;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 40 150 Q 120 90 200 60" fill="none" stroke="${K.sub}" stroke-width="2"/>`;
+    s += `<path d="M 40 150 Q 120 50 200 10" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<text x="120" y="100" fill="${K.pri}" font-size="11">纵向拉伸</text>`;
+    return S(W, H, s);
+  };
+  Fig.gtrans_abs = function () {
+    const W = 300, H = 200, cy = 130;
+    let s = `<line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="${K.ink}" stroke-width="1.2"/>`;
+    s += `<path d="M 40 ${cy} Q 110 200 180 ${cy} Q 250 40 270 ${cy}" fill="none" stroke="${K.pri}" stroke-width="2.5"/>`;
+    s += `<path d="M 110 200 L 110 ${cy}" stroke="${K.ok}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    s += `<text x="90" y="180" fill="${K.ok}" font-size="11">翻折向上</text>`;
     return S(W, H, s);
   };
 

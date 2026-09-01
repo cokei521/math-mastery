@@ -1632,6 +1632,257 @@
     return results;
   }
 
+  /* ---------- 拓展：解析几何综合（coord_geo） ---------- */
+  function qCoordGeo(n) {
+    const results = [];
+    const sgn = v => v === 0 ? "" : (v > 0 ? "-" + v : "+" + (-v));
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        let x1 = rnd(-6, 6), y1 = rnd(-6, 6), x2 = rnd(-6, 6), y2 = rnd(-6, 6);
+        while (x1 === x2 && y1 === y2) { x2 = rnd(-6, 6); y2 = rnd(-6, 6); }
+        const d2 = (x2 - x1) ** 2 + (y2 - y1) ** 2, d = Math.sqrt(d2);
+        o = opts(d.toFixed(2), () => Math.sqrt(d2 + rnd(1, 10)).toFixed(2), () => Math.sqrt(Math.abs(d2 - rnd(1, 10))).toFixed(2), () => (Math.abs(x2 - x1) + Math.abs(y2 - y1)).toFixed(2));
+        q = `点 A(${x1},${y1}) 与 B(${x2},${y2}) 的距离是？`;
+        exp = `d = √[(${x2}−${x1})² + (${y2}−${y1})²] = √${d2} ≈ ${d.toFixed(2)}。`;
+      } else if (type === 1) {
+        const x1 = rnd(-8, 8), y1 = rnd(-8, 8), x2 = rnd(-8, 8), y2 = rnd(-8, 8);
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        o = opts(`(${mx},${my})`, () => `(${x1},${y1})`, () => `(${x2},${y2})`, () => `(${mx},${y1})`);
+        q = `线段 AB 中点（A(${x1},${y1})、B(${x2},${y2})）是？`;
+        exp = `中点 = ((x₁+x₂)/2,(y₁+y₂)/2) = (${mx},${my})。`;
+      } else if (type === 2) {
+        let x1 = rnd(-5, 5), y1 = rnd(-5, 5);
+        let x2 = rnd(-5, 5); while (x2 === x1) x2 = rnd(-5, 5);
+        const y2 = rnd(-5, 5), k = (y2 - y1) / (x2 - x1);
+        o = opts(k.toFixed(2), () => ((y1 - y2) / (x2 - x1)).toFixed(2), () => ((x2 - x1) / (y2 - y1)).toFixed(2), () => rnd(1, 5).toFixed(2));
+        q = `过 A(${x1},${y1})、B(${x2},${y2}) 的直线斜率 k = ？`;
+        exp = `k = (y₂−y₁)/(x₂−x₁) = (${y2}−${y1})/(${x2}−${x1}) = ${k.toFixed(2)}。`;
+      } else {
+        const a = rnd(-5, 5), b = rnd(-5, 5), r = rnd(2, 6);
+        o = opts(`(x${sgn(a)})²+(y${sgn(b)})²=${r * r}`, () => `(x${sgn(a)})²+(y${sgn(b)})²=${r * r + 1}`, () => `(x${sgn(a)})²+y²=${r * r}`, () => `x²+y²=${r * r}`);
+        q = `圆心 (${a},${b})、半径 ${r} 的圆的标准方程是？`;
+        exp = `标准方程 (x−a)²+(y−b)²=r² → (x${sgn(a)})²+(y${sgn(b)})²=${r * r}。`;
+      }
+      results.push(Q(q, o, type === 3 ? "基础" : "进阶", exp, "解析几何"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：琴生不等式与凸函数（jensen） ---------- */
+  function qJensen(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const fns = [["f(x)=x²", "f''=2>0，下凸（凸）"], ["f(x)=eˣ", "f''=eˣ>0，下凸（凸）"], ["f(x)=ln x (x>0)", "f''=−1/x²<0，上凸（凹）"], ["f(x)=√x (x>0)", "f''=−1/(4x^{3/2})<0，上凸（凹）"]];
+        const idx = rnd(0, 3);
+        o = opts(fns[idx][1].split("，")[1], () => "常数", () => "既凸又凹", () => "无凹凸性");
+        q = `函数 ${fns[idx][0]} 的凹凸性是？`;
+        exp = fns[idx][1] + "。";
+      } else if (type === 1) {
+        o = opts("f((x+y)/2) ≤ (f(x)+f(y))/2", () => "f((x+y)/2) ≥ (f(x)+f(y))/2", () => "f((x+y)/2) = (f(x)+f(y))/2", () => "f((x+y)/2) + (f(x)+f(y))/2 = 0");
+        q = "f 为下凸（凸）函数时，对 x,y 有？";
+        exp = "凸函数满足 Jensen：f((x+y)/2) ≤ (f(x)+f(y))/2。";
+      } else if (type === 2) {
+        o = opts("平方平均 ≥ 算术平均 ≥ 几何平均 ≥ 调和平均", () => "算术平均 ≥ 平方平均 ≥ 几何平均 ≥ 调和平均", () => "几何平均 ≥ 算术平均 ≥ 调和平均 ≥ 平方平均", () => "调和平均 ≥ 几何平均 ≥ 算术平均 ≥ 平方平均");
+        q = "对正数 a,b，四个经典平均的大小顺序是？";
+        exp = "Q ≥ A ≥ G ≥ H。这是 Jensen（凸性）的直接推论。";
+      } else {
+        o = opts("e^((x+y)/2) ≤ (eˣ+eʸ)/2", () => "e^((x+y)/2) ≥ (eˣ+eʸ)/2", () => "e^((x+y)/2) = (eˣ+eʸ)/2", () => "e^((x+y)/2) · (eˣ+eʸ)/2 = 1");
+        q = "由 Jensen 不等式，对 f(t)=eᵗ（x,y 任意）有？";
+        exp = "f(t)=eᵗ 下凸，故 e^((x+y)/2)=f((x+y)/2) ≤ (f(x)+f(y))/2 = (eˣ+eʸ)/2。";
+      }
+      results.push(Q(q, o, "进阶", exp, "琴生不等式"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：重要极限（important_limit） ---------- */
+  function qImpLimit(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("1", () => "0", () => "∞", () => "不存在");
+        q = "lim_{x→0} sin x / x = ？";
+        exp = "重要极限一：lim_{x→0} sin x / x = 1（夹逼或几何法证明）。";
+      } else if (type === 1) {
+        o = opts("e", () => "1", () => "∞", () => "0");
+        q = "lim_{x→∞} (1 + 1/x)^x = ？";
+        exp = "重要极限二：lim_{x→∞} (1+1/x)^x = e ≈ 2.71828。";
+      } else if (type === 2) {
+        o = opts("e", () => "1", () => "2", () => "∞");
+        q = "lim_{n→∞} (1 + 1/n)^n = ？（n 为正整数）";
+        exp = "离散情形极限也是 e。";
+      } else {
+        o = opts("e", () => "1", () => "0", () => "∞");
+        q = "lim_{x→0} (1 + x)^{1/x} = ？";
+        exp = "令 t=1/x，则 lim_{t→∞}(1+1/t)^t = e。";
+      }
+      results.push(Q(q, o, "基础", exp, "重要极限"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：棣莫弗定理（de_moivre） ---------- */
+  function qDeMoivre(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const m = rnd(2, 5);
+        o = opts(`cos(${m}θ)+i·sin(${m}θ)`, () => `cos θ + i·sin(${m}θ)`, () => `${m}(cos θ + i·sin θ)`, () => `cos(${m}θ)·sin(${m}θ)`);
+        q = `(cos θ + i·sin θ)^${m} = ？`;
+        exp = `棣莫弗定理：(cosθ+i sinθ)^m = cos(mθ)+i sin(mθ)。`;
+      } else if (type === 1) {
+        const r = rnd(2, 5), m = rnd(2, 4);
+        const root = Math.pow(r, 1 / m).toFixed(2);
+        o = opts(`${root}(cos((θ+2kπ)/${m}) + i·sin((θ+2kπ)/${m}))`, () => `${r}(cos(θ/${m}) + i·sin(θ/${m}))`, () => `${root}(cos θ + i·sin θ)`, () => `${Math.pow(r, 1 / m).toFixed(2)}(cos((θ+2kπ)/${m+1}) + i·sin((θ+2kπ)/${m+1}))`);
+        q = `复数 z = ${r}(cos θ + i·sin θ) 的 ${m} 次方根（k=0,…,${m-1}）是？`;
+        exp = `n 次方根模为 r^{1/${m}}=${root}，辐角 (θ+2kπ)/${m}。`;
+      } else if (type === 2) {
+        o = opts("n 个", () => "1 个", () => "2 个", () => "无穷多个");
+        q = "方程 zⁿ = 1（n 为正整数）在复数范围内的根有？";
+        exp = "单位圆上的 n 次单位根共 n 个：e^{2πik/n}（k=0,…,n-1）。";
+      } else {
+        const p = rnd(0, 1) ? 2 : 4;
+        o = opts(p === 2 ? "2i" : "-4", () => p === 2 ? "-2i" : "4", () => "0", () => p === 2 ? "2" : "8");
+        q = `(1+i)^${p} = ？`;
+        exp = p === 2 ? "(1+i)² = 1+2i+i² = 2i。" : "(1+i)^4 = ((1+i)²)² = (2i)² = -4。";
+      }
+      results.push(Q(q, o, type === 2 ? "基础" : "进阶", exp, "棣莫弗定理"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：随机变量与数字特征（random_var） ---------- */
+  function qRandVar(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(2, 5), b = rnd(1, 5), mu = rnd(1, 4);
+        o = opts(`${a * mu + b}`, () => `${a * mu}`, () => `${mu + b}`, () => `${a * mu - b}`);
+        q = `若 E(X)=${mu}，则 E(${a}X+${b}) = ？`;
+        exp = `线性性质：E(aX+b)=aE(X)+b = ${a}·${mu}+${b} = ${a * mu + b}。`;
+      } else if (type === 1) {
+        const a = rnd(2, 5), s2 = rnd(1, 4);
+        o = opts(`${a * a * s2}`, () => `${a * s2}`, () => `${s2}`, () => `${a * a + s2}`);
+        q = `若 D(X)=${s2}，则 D(${a}X) = ？`;
+        exp = `D(aX)=a²D(X)=${a}²·${s2}=${a * a * s2}。`;
+      } else if (type === 2) {
+        const p = rnd(2, 8) / 10, dp = (p * (1 - p)).toFixed(2);
+        o = opts(`E=${p}, D=${dp}`, () => `E=${p}, D=${(p * p).toFixed(2)}`, () => `E=${dp}, D=${p}`, () => `E=${1 - p}, D=${p}`);
+        q = `X~两点分布，P(X=1)=${p}，则 E(X)、D(X) 是？`;
+        exp = `两点分布：E=p=${p}，D=p(1-p)=${dp}。`;
+      } else {
+        const nn = rnd(5, 15), p = rnd(2, 7) / 10, e = (nn * p).toFixed(0), d = (nn * p * (1 - p)).toFixed(2);
+        o = opts(`E=${e}, D=${d}`, () => `E=${nn}, D=${d}`, () => `E=${e}, D=${(nn * p * nn * p).toFixed(2)}`, () => `E=${p}, D=${d}`);
+        q = `X~B(${nn}, ${p})（二项分布），则 E(X)、D(X) 是？`;
+        exp = `二项分布：E=np=${nn}·${p}=${e}，D=np(1-p)=${d}。`;
+      }
+      results.push(Q(q, o, "进阶", exp, "随机变量"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：傅里叶级数初步（fourier） ---------- */
+  function qFourier(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        o = opts("a₀/2 + Σ(aₙ cos nx + bₙ sin nx)", () => "Σ aₙ xⁿ", () => "Σ aₙ eⁿ", () => "a₀ + Σ aₙ cos nx");
+        q = "周期为 2π 的函数可展开为？";
+        exp = "傅里叶级数：f(x) ~ a₀/2 + Σ(aₙ cos nx + bₙ sin nx)。";
+      } else if (type === 1) {
+        o = opts("只有正弦项（bₙ）", () => "只有余弦项（aₙ）", () => "只有常数项", () => "既有正弦又有余弦");
+        q = "奇函数 f(−x)=−f(x) 的傅里叶展开？";
+        exp = "奇函数：aₙ=0，只含正弦项（正弦级数）。";
+      } else if (type === 2) {
+        o = opts("只有余弦项（aₙ）", () => "只有正弦项（bₙ）", () => "只有常数项", () => "既有正弦又有余弦");
+        q = "偶函数 f(−x)=f(x) 的傅里叶展开？";
+        exp = "偶函数：bₙ=0，只含余弦项（余弦级数）。";
+      } else {
+        const T = [2, 4, 6, 8][rnd(0, 3)], w = (2 * Math.PI / T).toFixed(2);
+        o = opts(`ω=${w}`, () => `${(Math.PI / T).toFixed(2)}`, () => `${(4 * Math.PI / T).toFixed(2)}`, () => `${(T / (2 * Math.PI)).toFixed(2)}`);
+        q = `周期为 T=${T} 的函数，基频 ω = ？`;
+        exp = `基频 ω = 2π/T = 2π/${T} = ${w}。`;
+      }
+      results.push(Q(q, o, "基础", exp, "傅里叶级数"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：定积分应用（integral_app） ---------- */
+  function qIntApp(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(0, 2), b = rnd(3, 5), area = (b * b - a * a) / 2;
+        o = opts(`${area}`, () => `${b * b - a * a}`, () => `${b - a}`, () => `${(b * b * a * a) / 2}`);
+        q = `曲线 y=x 与 x 轴在 [${a}, ${b}] 围成的面积 = ∫_{${a}}^{${b}} x dx = ？`;
+        exp = `∫ x dx = x²/2，面积 = (${b}²−${a}²)/2 = ${area}。`;
+      } else if (type === 1) {
+        const a = rnd(0, 2), b = rnd(2, 4), V = (Math.PI * (b * b * b - a * a * a) / 3).toFixed(2);
+        o = opts(`${V}`, () => `${(Math.PI * (b - a) / 3).toFixed(2)}`, () => `${(Math.PI * (b * b - a * a) / 3).toFixed(2)}`, () => `${(Math.PI * (b * b * b - a * a * a) / 2).toFixed(2)}`);
+        q = `y=x 绕 x 轴在 [${a}, ${b}] 旋转所得体积 V = π∫_{${a}}^{${b}} x² dx = ？`;
+        exp = `π∫ x² dx = π·x³/3，V = π(${b}³−${a}³)/3 = ${V}。`;
+      } else if (type === 2) {
+        const a = rnd(0, 2), b = rnd(3, 6), avg = (b * b - a * a) / (2 * (b - a));
+        o = opts(`${avg.toFixed(2)}`, () => `${(b + a).toFixed(2)}`, () => `${(b * b - a * a).toFixed(2)}`, () => `${(b - a).toFixed(2)}`);
+        q = `函数 y=x 在 [${a}, ${b}] 上的平均值 = ？`;
+        exp = `平均值 = (1/(b−a))∫ x dx = (a+b)/2 = ${avg.toFixed(2)}。`;
+      } else {
+        const b = rnd(2, 4), L = (Math.SQRT2 * b).toFixed(2);
+        o = opts(`${L}`, () => `${b.toFixed(2)}`, () => `${(2 * b).toFixed(2)}`, () => `${(Math.SQRT2 * (b + 1)).toFixed(2)}`);
+        q = `曲线 y=x（0≤x≤${b}）的弧长 = ？`;
+        exp = `弧长 = ∫_0^${b} √(1+(y')²) dx = ∫_0^${b} √2 dx = √2·${b} = ${L}。`;
+      }
+      results.push(Q(q, o, "进阶", exp, "定积分应用"));
+    }
+    return results;
+  }
+
+  /* ---------- 拓展：函数图像变换（graph_transform） ---------- */
+  function qGraphTrans(n) {
+    const results = [];
+    for (let i = 0; i < n; i++) {
+      const type = i % 4;
+      let q, o, exp;
+      if (type === 0) {
+        const a = rnd(1, 4);
+        o = opts(`向右平移 ${a}`, () => `向左平移 ${a}`, () => `向上平移 ${a}`, () => `关于 y 轴对称`);
+        q = `将 y=f(x) 变为 y=f(x−${a}) 的变换是？`;
+        exp = `y=f(x−a) 是 y=f(x) 向右平移 ${a} 个单位（左加右减）。`;
+      } else if (type === 1) {
+        o = opts("关于 y 轴对称", () => "关于 x 轴对称", () => "关于原点对称", () => "向右平移 1");
+        q = "y=f(x) → y=f(−x) 的变换是？";
+        exp = "x 取相反数，图像关于 y 轴对称。";
+      } else if (type === 2) {
+        const A = rnd(2, 4);
+        o = opts(`纵向拉伸为 ${A} 倍`, () => `纵向压缩为 ${A} 倍`, () => `横向拉伸为 ${A} 倍`, () => `横向压缩为 ${A} 倍`);
+        q = `y=f(x) → y=${A}f(x) 的变换是？`;
+        exp = `系数乘在函数值上：纵坐标变为原来的 ${A} 倍（纵向伸缩）。`;
+      } else {
+        o = opts("将 x 轴下方的部分翻折到上方", () => "将 y 轴左侧翻折到右侧", () => "整体向上平移", () => "关于 y 轴对称");
+        q = "y=f(x) → y=|f(x)| 的变换是？";
+        exp = "y=|f(x)|：保留 x 轴上方，将下方部分沿 x 轴翻折到上方。";
+      }
+      results.push(Q(q, o, "基础", exp, "图像变换"));
+    }
+    return results;
+  }
+
   /* ============================================================
    * 注册到 window.TECHNIQUES
    * ============================================================ */
@@ -1660,6 +1911,14 @@
     seq_ineq: qSeqIneq,
     complex_geo: qComplexGeo,
     series: qSeries,
+    coord_geo: qCoordGeo,
+    jensen: qJensen,
+    important_limit: qImpLimit,
+    de_moivre: qDeMoivre,
+    random_var: qRandVar,
+    fourier: qFourier,
+    integral_app: qIntApp,
+    graph_transform: qGraphTrans,
     set: qSet,
     funcconcept: qFuncConcept,
     explog: qExpLog,
