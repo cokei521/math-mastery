@@ -13,3 +13,6 @@ _*.js
 _check_*.js
 _validate*.js
 _t.js
+
+# 本地备份
+*.bak

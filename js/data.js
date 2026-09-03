@@ -1916,7 +1916,7 @@ window.TECHNIQUES = [
     ]
   },
   {
-    id: "tree", grade: "六年级+", stage: "高中", name: "树状图法", anim: "tree",
+    id: "tree", grade: "十一年级", stage: "高中", name: "树状图法", anim: "tree",
     summary: "把多步决策/概率逐层画成树，分支相乘、路径相加，是计数与概率的通用工具。",
     kou: "每一步画一枝，枝头再分杈；分步相乘、分类相加，概率沿路乘。",
     steps: [
